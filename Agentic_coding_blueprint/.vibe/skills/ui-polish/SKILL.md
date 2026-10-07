@@ -1,7 +1,8 @@
 # Skill: ui-polish
-1. Check screen vs design-system.
-2. Fix spacing/alignment/type/color.
-3. Verify loading/empty/error states.
-4. Verify mobile.
-5. Never invent new styles — extend the design system.
-6. Audit all UI text: strip any leaked tech stack, database names, auth providers, or protocol badges (e.g. "Powered by...", "WebSocket", "Supabase", "PostgreSQL"). Ensure language is 100% user- and domain-centric.
+
+1. Inspect Slint layout vs `.vibe/product/design-system.md`.
+2. Verify micro-interactions: Close ('X') button reveals only on header hover; resize grip reveals only on corner hover.
+3. Test multiple note dimensions: Small (200×150), Medium (300×200), Large (450×350), and freeform user resizing.
+4. Verify typography rendering and high-contrast charcoal text on pastel backgrounds.
+5. Verify behavior across High-DPI scaling factors (100%, 125%, 150%, 200%).
+6. Audit all copy: ensure 100% user-centric copy with zero technical plumbing or error codes displayed in note bodies.

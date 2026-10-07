@@ -1,7 +1,8 @@
 # architecture.md
 
-- Respect `.vibe/architecture/` boundaries and invariants.
-- New features must fit the structure; otherwise propose an ADR first.
-- No circular dependencies between modules.
-- Shared logic in shared modules.
-- No invented infrastructure without approval.
+- Respect component boundaries in `.vibe/context/architecture.md`.
+- Two-executable architecture: `Sticky Note` (manager) and `Sticky Note Settings` (utility) must remain strictly decoupled.
+- Shared logic lives exclusively in `crates/sticky-note-core/`.
+- UI rendering code must never execute blocking disk I/O on the main GUI thread.
+- Never add unnecessary runtime layers (no async runtimes, no browser webviews).
+- Proposed architectural shifts require an accepted ADR in `.vibe/decisions/`.
