@@ -4,15 +4,16 @@
 Implement authentic physical sticky note micro-interactions: hover disclosure of quick-add (`+`) and close (`X`), double-click title renaming, right-click 6-color palette, and keyboard-only text formatting.
 
 ## Requirements
-1. **Title Auto-Increment**:
-   - New notes automatically receive the title `"Untitled Note 1"`.
-   - If `"Untitled Note 1"` is already taken, increment sequentially (`"Untitled Note 2"`, etc.).
-2. **Double-Click Rename**:
+1. **Title Auto-Increment (`Note 1`, `Note 2`)**:
+   - New notes automatically receive the title `"Note 1"`.
+   - If `"Note 1"` is already taken, increment sequentially (`"Note 2"`, `"Note 3"`, etc.).
+2. **Double-Click Rename & Placeholder**:
    - Double-clicking header text activates inline `TextInput`.
+   - If user types nothing, clears the text, or types only whitespace, it stays on the placeholder `"Write title here..."` or cleanly falls back to `"Note N"`.
    - `Enter` commits title; `Escape` cancels; focus loss commits changes.
 3. **Hover-Only Header Controls**:
-   - Top-left `+` button: Revealed on header hover. Clicking immediately spawns and cascades a new note.
-   - Top-right `X` button: Revealed on header hover.
+   - Top-left `+` button: Completely invisible normally; reveals only on header hover. Clicking immediately spawns and cascades a new note.
+   - Top-right `X` button: Completely invisible normally; reveals only on header hover.
 4. **Configurable Close ('X') Behavior**:
    - Reads `close_action` from `config.json`:
      - `"delete"`: Permanently removes note from `Notes.json`.

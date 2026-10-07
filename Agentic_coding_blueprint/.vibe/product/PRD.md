@@ -57,21 +57,24 @@ Sticky Note/
 | **Window Chrome** | Frameless/borderless window with subtle soft shadow. No OS caption bar. |
 | **Taskbar / Switcher** | Excluded from Windows Taskbar, macOS Dock, and Alt+Tab / Cmd+Tab app switchers (`WS_EX_TOOLWINDOW`). |
 | **Movement** | Dragging from anywhere on the header moves the window smoothly across monitors. |
-| **Resizing & Dynamic Inheritance** | Hovering over the bottom-right corner reveals the resize grip. Dragging resizes the note (min: 180×120). **Crucial Sizing Rule:** Whenever a user resizes any note, that new `(width, height)` is automatically remembered as the default dimensions for all subsequently spawned notes. No static size presets in settings. |
+| **Resizing & Dynamic Inheritance** | Resizing is single-direction (outward horizontally to the right and vertically downward from bottom-right corner; top-left stays anchored). **Hover-Only Visibility:** The corner resize indicator is **100% invisible** until the cursor hovers directly over the bottom-right corner. Min size: 180×120. When resized, that `(width, height)` automatically becomes the default for all future notes. |
 | **Bottom-Right Corner Appearance** | Features an authentic **bended / curled paper corner** (dog-ear curl look with soft drop-shadow) simulating physical paper, or clean **flat** corner. Togglable in `Sticky Note Settings`. |
 | **Per-Note Geometry Persistence** | Each note saves its own exact `(x, y, width, height)` in `Notes.json` so every note reopens exactly as placed. |
 
 ### 4.2. Header, Quick-Add & Title Behavior
 
-- **Hover Header Controls:** Both the top-left `+` button and top-right `X` button are hidden by default, smoothly fading into view only when hovering over the header area.
+- **Hover-Only Header Controls:** Both the top-left `+` button and top-right `X` button are **100% invisible** during normal display, smoothly fading into view only when the cursor hovers over the header area.
 - **Top-Left `+` Button:** Clicking `+` instantly creates and cascades a new sticky note directly next to the current one.
 - **Top-Right `X` Button (Configurable):**
   - Configurable via `Sticky Note Settings`:
     1. **Delete Note:** Instantly removes the note from disk.
     2. **Close & Save:** Hides the note window while preserving its contents safely in `Notes.json`.
     3. **Ask on Click:** Displays a tiny, themed confirmation prompt: *"Delete note or just close?"*
-- **Automatic Sequential Naming:** Newly created notes are titled `"Untitled Note 1"`, incrementing to `"Untitled Note 2"`, etc., if already taken.
-- **Double-Click Inline Rename:** Double-clicking the header replaces the title text with an inline input field. Pressing `Enter` commits the new title; `Escape` cancels.
+- **Clean Sequential Naming (`Note 1`, `Note 2`):** Newly created notes are titled `"Note 1"`, incrementing to `"Note 2"`, `"Note 3"`, etc. No awkward "Untitled" prefix.
+- **Placeholder & Double-Click Rename:**
+  - Double-clicking the header activates inline title editing.
+  - If nothing has been typed, or if cleared with spaces, it retains the placeholder `"Write title here..."` or cleanly falls back to `"Note N"`.
+  - Pressing `Enter` commits; `Escape` cancels.
 
 ### 4.3. Text Area, 6-Color Palette & Keyboard Formatting
 
@@ -114,6 +117,12 @@ A minimal, small popup window designed with the **exact same pastel paper aesthe
 4. **Shortcuts:**
    - Display & edit global shortcuts for New Note and Settings.
 *(Note: No static size presets; no trash recovery engine).*
+
+### 4.6. Direct File Access & Explorer Double-Click Launch
+
+- **Individual Note Files in `Sticky Note Notes/`:** Each note is stored as an individual, accessible file (e.g. `Note 1.json`, `Note 2.json`, ...) alongside the index.
+- **Double-Click Launch in Background:** Double-clicking any note file in Windows File Explorer launches/signals `Sticky Note.exe` in the background to immediately open, restore, and display that note window on the desktop.
+- **Solves File Accessibility:** Users can browse, open, copy, or organize their notes directly from their native OS file manager without needing an in-app file browser.
 
 ---
 
