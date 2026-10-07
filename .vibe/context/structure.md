@@ -8,7 +8,7 @@ StickyNotes/
 ├── config.json                    # Shared application preferences
 ├── Sticky Note Notes/             # Data directory
 │   ├── Notes.json                 # Index & metadata of notes
-│   └── note-*.json                # Individual note files
+│   └── Note 1.json                # Individual note files (Note 1.json, Note 2.json, ...)
 ├── crates/
 │   ├── sticky-note-core/          # Shared models, persistence & platform abstractions
 │   │   ├── Cargo.toml

@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "general": {
+    "start_with_os": false
+  },
+  "note_appearance": {
+    "last_used_width": 300,
+    "last_used_height": 200,
+    "corner_style": "curled",
+    "font_family": "Segoe UI",
+    "font_size": 14,
+    "default_color": "yellow"
+  },
+  "behavior": {
+    "close_action": "ask",
+    "autosave_debounce_ms": 300
+  },
+  "shortcuts": {
+    "new_note": "Ctrl+Alt+N",
+    "open_settings": "Ctrl+Alt+S"
+  }
+}

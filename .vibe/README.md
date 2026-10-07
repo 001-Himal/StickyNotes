@@ -4,8 +4,8 @@ Canonical source of truth for how AI agents work on this project + project track
 
 ## Read order
 
-1. `../README.md` (Blueprint README — read first)
-2. `../AGENTS.md`
+1. `README.md` (Project README — read first)
+2. `AGENTS.md`
 3. `.vibe/README.md` (this file)
 4. `context/project.md` → `stack.md` → `architecture.md`
 5. `product/PRD.md`

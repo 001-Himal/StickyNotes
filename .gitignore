@@ -1,0 +1,29 @@
+# Rust / Cargo build artifacts
+/target/
+**/*.rs.bk
+*.pdb
+
+# Local application state & user notes
+config.json
+/Sticky Note Notes/*.json
+!/Sticky Note Notes/.gitkeep
+
+# Logs & temp files
+*.log
+*.tmp
+*.bak
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.sw?
+*~
+*.suo
+*.user
+*.sln
+

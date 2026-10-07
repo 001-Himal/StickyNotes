@@ -11,7 +11,7 @@ Store all notes locally within `Sticky Note Notes/Notes.json` with 100% data int
   "notes": [
     {
       "id": "note-001",
-      "title": "Untitled Note 1",
+      "title": "Note 1",
       "content": "Meeting notes at 3pm\nBuy groceries",
       "x": 420,
       "y": 180,

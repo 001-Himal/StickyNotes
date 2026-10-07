@@ -14,12 +14,16 @@ Modern notes applications have become bloated "productivity ecosystems" with mul
 - In:
   - Multi-window lightweight sticky note widgets.
   - Native desktop layer behavior (visible on desktop, hidden under active applications).
-  - Clean borderless UI with hover-only controls (corner close 'X', bottom-right resize handle).
-  - Double-click header to inline-rename ("Untitled Note 1", "Untitled Note 2", etc.).
-  - Completely local persistence in `Sticky Note Notes/Notes.json`.
-  - Independent `Sticky Note Settings` executable with shared `config.json`.
+  - Clean borderless UI with hover-only controls (corner close 'X', top-left '+', bottom-right single-direction resize handle).
+  - Header title auto-incrementing ("Note 1", "Note 2", etc.) with placeholder ("Write note here...") when empty, inline-renamable.
+  - Authentic 6 pastel palettes (two-tone header and body) and curled/bended paper corner (togglable to flat in settings).
+  - Dynamic sizing inheritance (resizing any note sets default size for new notes).
+  - Keyboard-only text formatting (`Ctrl+B`, `Ctrl+I`, `Ctrl+U`, `Ctrl+L`).
+  - Completely local persistence with individual note files in `Sticky Note Notes/` (`Note 1.json`, etc.) and `Notes.json` index.
+  - Windows File Explorer direct launch: double-clicking note JSON opens it directly in `Sticky Note.exe`.
+  - Independent `Sticky Note Settings` executable with shared `config.json` styled in matching sticky paper aesthetic.
   - Global system shortcuts (`Ctrl+Alt+N` for new note, `Ctrl+Alt+S` for settings).
-  - Cross-platform support (Windows, macOS, Linux).
+  - Cross-platform support (Windows first-class, macOS, Linux).
   - Strict performance target: <50 MB total RAM, ~0% idle CPU, <1s startup.
 - Out:
   - Cloud synchronization, accounts, user logins.
