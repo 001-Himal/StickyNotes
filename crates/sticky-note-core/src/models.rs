@@ -71,8 +71,8 @@ impl Default for NoteAppearanceConfig {
             last_used_width: 300,
             last_used_height: 200,
             corner_style: CornerStyle::Curled,
-            font_family: "Segoe UI".to_string(),
-            font_size: 14,
+            font_family: "Segoe Print".to_string(),
+            font_size: 15,
             default_color: NoteColor::Yellow,
         }
     }
@@ -146,6 +146,12 @@ pub struct NoteMetadata {
     pub created_at: u64,
     pub updated_at: u64,
     pub is_closed: bool,
+    #[serde(default)]
+    pub is_bold: bool,
+    #[serde(default)]
+    pub is_italic: bool,
+    #[serde(default)]
+    pub is_underlined: bool,
 }
 
 /// Document schema for the primary `Notes.json` index file.
@@ -181,6 +187,12 @@ pub struct Note {
     pub created_at: u64,
     pub updated_at: u64,
     pub is_closed: bool,
+    #[serde(default)]
+    pub is_bold: bool,
+    #[serde(default)]
+    pub is_italic: bool,
+    #[serde(default)]
+    pub is_underlined: bool,
 }
 
 impl Note {
@@ -198,6 +210,9 @@ impl Note {
             created_at: self.created_at,
             updated_at: self.updated_at,
             is_closed: self.is_closed,
+            is_bold: self.is_bold,
+            is_italic: self.is_italic,
+            is_underlined: self.is_underlined,
         }
     }
 }
@@ -229,6 +244,9 @@ mod tests {
             created_at: 1728280000,
             updated_at: 1728280050,
             is_closed: false,
+            is_bold: false,
+            is_italic: false,
+            is_underlined: false,
         };
 
         let json = serde_json::to_string(&note).expect("Serialize note");

@@ -7,9 +7,10 @@ use windows_sys::Win32::Graphics::Gdi::{
     GetMonitorInfoW, MonitorFromPoint, MONITORINFO, MONITOR_DEFAULTTONEAREST,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, FindWindowW, GetWindowLongPtrW, GetWindowThreadProcessId, SetWindowLongPtrW,
-    SetWindowPos, GWL_EXSTYLE, HWND_BOTTOM, SWP_FRAMECHANGED, SWP_NOACTIVATE, SWP_NOMOVE,
-    SWP_NOSIZE, WS_EX_APPWINDOW, WS_EX_TOOLWINDOW,
+    EnumWindows, FindWindowW, GetWindowLongPtrW, GetWindowThreadProcessId, SetForegroundWindow,
+    SetWindowLongPtrW, SetWindowPos, GWL_EXSTYLE, HWND_BOTTOM, HWND_TOP, SWP_FRAMECHANGED,
+    SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SWP_SHOWWINDOW, WS_EX_APPWINDOW,
+    WS_EX_TOOLWINDOW,
 };
 
 unsafe extern "system" fn enum_process_windows_proc(hwnd: HWND, lparam: LPARAM) -> BOOL {
@@ -50,8 +51,7 @@ pub unsafe fn find_window_by_title(title: &str) -> Option<HWND> {
 }
 
 /// Applies stealth window styles (`WS_EX_TOOLWINDOW` and strips `WS_EX_APPWINDOW`)
-/// and immediately sinks the window to `HWND_BOTTOM` with `SWP_FRAMECHANGED` to omit
-/// the note from the Windows Taskbar and Alt+Tab application switcher.
+/// with `SWP_FRAMECHANGED` to omit the note from the Windows Taskbar and Alt+Tab application switcher.
 ///
 /// # Safety
 /// Calls Win32 `GetWindowLongPtrW`, `SetWindowLongPtrW`, and `SetWindowPos` FFI.
@@ -61,13 +61,42 @@ pub unsafe fn apply_stealth_window_styles(hwnd: HWND) {
     SetWindowLongPtrW(hwnd, GWL_EXSTYLE, new_ex_style);
     SetWindowPos(
         hwnd,
-        HWND_BOTTOM,
         0,
         0,
         0,
         0,
-        SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+        0,
+        SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE,
     );
+}
+
+/// Brings a window to the top of the z-order and activates it.
+///
+/// # Safety
+/// Calls Win32 `SetWindowPos` and `SetForegroundWindow` FFI.
+pub unsafe fn bring_window_to_front(hwnd: HWND) {
+    apply_stealth_window_styles(hwnd);
+    SetWindowPos(
+        hwnd,
+        HWND_TOP,
+        0,
+        0,
+        0,
+        0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW,
+    );
+    SetForegroundWindow(hwnd);
+}
+
+/// Brings all windows belonging to the current process to the front and activates them.
+///
+/// # Safety
+/// Calls Win32 FFI functions.
+pub unsafe fn bring_all_process_windows_to_front() {
+    let hwnds = find_process_windows();
+    for hwnd in hwnds {
+        bring_window_to_front(hwnd);
+    }
 }
 
 /// Sinks a window directly to the desktop bottom layer (`HWND_BOTTOM`)

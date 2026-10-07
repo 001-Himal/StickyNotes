@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Sticky Note Contributors
 // SPDX-License-Identifier: MIT
 
-import { Button, CheckBox, LineEdit } from "std-widgets.slint";
 
 component OptionButton inherits Rectangle {
     in property <string> text;
@@ -395,11 +394,25 @@ export component SettingsWindow inherits Window {
                                 font-size: 10px;
                                 color: #2B2B2B80;
                             }
-                            new-inp := LineEdit {
-                                text <=> root.shortcut-new-note;
+                            new-inp := Rectangle {
                                 height: 26px;
-                                accepted => {
-                                    root.shortcut-new-note-changed(self.text);
+                                background: #FFFFFF;
+                                border-radius: 4px;
+                                border-width: 1px;
+                                border-color: #00000025;
+                                TextInput {
+                                    x: 8px;
+                                    width: parent.width - 16px;
+                                    height: 100%;
+                                    vertical-alignment: center;
+                                    text <=> root.shortcut-new-note;
+                                    color: #2B2B2B;
+                                    font-size: 11px;
+                                    font-weight: 600;
+                                    single-line: true;
+                                    accepted => {
+                                        root.shortcut-new-note-changed(self.text);
+                                    }
                                 }
                             }
                         }
@@ -410,11 +423,25 @@ export component SettingsWindow inherits Window {
                                 font-size: 10px;
                                 color: #2B2B2B80;
                             }
-                            set-inp := LineEdit {
-                                text <=> root.shortcut-settings;
+                            set-inp := Rectangle {
                                 height: 26px;
-                                accepted => {
-                                    root.shortcut-settings-changed(self.text);
+                                background: #FFFFFF;
+                                border-radius: 4px;
+                                border-width: 1px;
+                                border-color: #00000025;
+                                TextInput {
+                                    x: 8px;
+                                    width: parent.width - 16px;
+                                    height: 100%;
+                                    vertical-alignment: center;
+                                    text <=> root.shortcut-settings;
+                                    color: #2B2B2B;
+                                    font-size: 11px;
+                                    font-weight: 600;
+                                    single-line: true;
+                                    accepted => {
+                                        root.shortcut-settings-changed(self.text);
+                                    }
                                 }
                             }
                         }
@@ -422,15 +449,41 @@ export component SettingsWindow inherits Window {
                 }
 
                 // 6. Startup with OS
-                HorizontalLayout {
-                    spacing: 8px;
-                    alignment: start;
-                    cb := CheckBox {
-                        text: "Start Sticky Note automatically on Windows boot";
-                        checked: root.start-with-os;
-                        toggled => {
-                            root.start-with-os = self.checked;
-                            root.start-with-os-changed(self.checked);
+                TouchArea {
+                    mouse-cursor: pointer;
+                    clicked => {
+                        root.start-with-os = !root.start-with-os;
+                        root.start-with-os-changed(root.start-with-os);
+                    }
+                    HorizontalLayout {
+                        spacing: 8px;
+                        alignment: start;
+
+                        Rectangle {
+                            width: 18px;
+                            height: 18px;
+                            border-radius: 4px;
+                            background: root.start-with-os ? #2B2B2B : #FFFFFF;
+                            border-width: 1.5px;
+                            border-color: root.start-with-os ? #2B2B2B : #00000035;
+
+                            if root.start-with-os: Path {
+                                width: 10px;
+                                height: 8px;
+                                x: 4px;
+                                y: 5px;
+                                stroke: #FFFFFF;
+                                stroke-width: 1.5px;
+                                commands: "M 1 4 L 4 7 L 9 1";
+                            }
+                        }
+
+                        Text {
+                            text: "Start Sticky Note automatically on Windows boot";
+                            font-size: 11px;
+                            font-weight: 500;
+                            color: #2B2B2B;
+                            vertical-alignment: center;
                         }
                     }
                 }

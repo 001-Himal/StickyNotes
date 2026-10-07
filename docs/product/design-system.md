@@ -36,10 +36,12 @@ The `Sticky Note Settings` window intentionally shares this exact design languag
 - Same typography and charcoal text tones.
 - Never rendered as a cold grey system dialog.
 
-## Typography
-- **Font Stack:** Native system sans-serif (`Segoe UI` on Windows, `SF Pro` on macOS, `Roboto`/`Noto Sans` on Linux).
-- **Body Font Size:** 14px default (scalable in settings).
-- **Header Title Font Size:** 12px semi-bold.
+## Typography & Text Styling
+- **Default Font:** Authentic Windows 7 cursive handwriting font **`Segoe Print`** (`segoepr.ttf`), shipped with Windows. Fallbacks: `Segoe Script`, `Comic Sans MS`, `Bradley Hand`, cursive.
+- **Body Font Size:** 15px default (scalable via settings or in-editor `Ctrl + =` / `Ctrl + -`).
+- **Header Title Font Size:** 12px semi-bold (`Segoe Print` / system sans-serif).
+- **Seamless Canvas:** 100% transparent text area across all themes and focus states. The note body never shifts color or displays dark input boxes in dark mode.
+- **Ruled Paper Guidelines:** Toggling underline mode (`Ctrl + U`) displays subtle, elegant horizontal notebook ruled lines (15% opacity ink tone) spaced at 24px intervals.
 
 ## Header Bar & Controls
 - **Height:** 28px fixed.

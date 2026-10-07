@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Sticky Note Contributors
 // SPDX-License-Identifier: MIT
 
-import { TextEdit } from "std-widgets.slint";
+import { ScrollView } from "std-widgets.slint";
 
 /// Color swatch component for the 6-color right-click palette menu
 component ColorSwatch inherits Rectangle {
@@ -46,8 +46,11 @@ export component NoteWindow inherits Window {
     in-out property <string> note-content: "";
     in-out property <string> color-theme: "yellow";
     in-out property <string> corner-style: "curled"; // "curled" or "flat"
-    in-out property <string> font-family: "Segoe UI";
-    in-out property <length> font-size: 14px;
+    in-out property <string> font-family: "Segoe Print";
+    in-out property <length> font-size: 15px;
+    in-out property <bool> is-bold: false;
+    in-out property <bool> is-italic: false;
+    in-out property <bool> is-underlined: false;
 
     // Two-Tone Palette Colors
     in-out property <color> header-bg: #F6E077;
@@ -120,6 +123,22 @@ export component NoteWindow inherits Window {
                         root.format-requested("bullet");
                         return accept;
                     }
+                    if (event.text == "=" || event.text == "+" || event.text == ">") {
+                        root.format-requested("font-larger");
+                        return accept;
+                    }
+                    if (event.text == "-" || event.text == "_" || event.text == "<") {
+                        root.format-requested("font-smaller");
+                        return accept;
+                    }
+                    if (event.text == "n" || event.text == "N" || event.text == "\u{000e}") {
+                        root.add-note-clicked();
+                        return accept;
+                    }
+                    if (event.text == "d" || event.text == "D" || event.text == "\u{0004}") {
+                        root.close-note-clicked();
+                        return accept;
+                    }
                 }
                 return reject;
             }
@@ -152,6 +171,8 @@ export component NoteWindow inherits Window {
                             }
                         } else if (event.kind == PointerEventKind.up && event.button == PointerEventButton.left) {
                             root.window-moved-completed();
+                        } else if (event.kind == PointerEventKind.down && event.button == PointerEventButton.right) {
+                            root.show-color-palette = !root.show-color-palette;
                         }
                     }
                     double-clicked => {
@@ -279,6 +300,7 @@ export component NoteWindow inherits Window {
             // ==========================================
             body-container := Rectangle {
                 background: transparent;
+                clip: true;
 
                 // Right-click trigger for 6-color palette
                 content-touch := TouchArea {
@@ -297,15 +319,40 @@ export component NoteWindow inherits Window {
                     }
                 }
 
-                editor := TextEdit {
-                    x: 8px;
-                    y: 6px;
-                    width: parent.width - 16px;
-                    height: parent.height - 12px;
-                    text <=> root.note-content;
-                    font-size: root.font-size;
-                    edited => {
-                        root.content-changed(self.text);
+                // Authentic notebook ruled lines when underline / ruled mode is toggled on
+                if root.is-underlined: Rectangle {
+                    width: 100%;
+                    height: 100%;
+                    for line-idx in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]: Rectangle {
+                        y: line-idx * 24px + 6px;
+                        width: 100%;
+                        height: 1px;
+                        background: root.text-color.transparentize(0.85);
+                    }
+                }
+
+                ScrollView {
+                    x: 10px;
+                    y: 4px;
+                    width: parent.width - 20px;
+                    height: parent.height - 8px;
+
+                    editor := TextInput {
+                        width: parent.width;
+                        wrap: word-wrap;
+                        single-line: false;
+                        text <=> root.note-content;
+                        color: root.text-color;
+                        selection-background-color: #0078D740;
+                        selection-foreground-color: root.text-color;
+                        font-family: root.font-family;
+                        font-size: root.font-size;
+                        font-weight: root.is-bold ? 700 : 400;
+                        font-italic: root.is-italic;
+
+                        edited => {
+                            root.content-changed(self.text);
+                        }
                     }
                 }
             }

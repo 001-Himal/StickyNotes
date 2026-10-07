@@ -421,6 +421,9 @@ mod tests {
             created_at: 1000,
             updated_at: 1000,
             is_closed: false,
+            is_bold: false,
+            is_italic: false,
+            is_underlined: false,
         };
 
         // 1. Save note

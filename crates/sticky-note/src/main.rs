@@ -6,9 +6,9 @@ mod hotkeys;
 #[cfg(windows)]
 use sticky_note_core::{clamp_to_monitor_bounds, stealth_and_sink_all_process_windows};
 use sticky_note_core::{
-    apply_text_formatting, current_timestamp, generate_next_title, load_config_or_default,
-    load_json, resolve_title, send_ipc_command, update_default_note_size, CloseAction, Config,
-    CornerStyle, IpcCommand, IpcServer, Note, NoteColor, NotesDocument, StorageEngine,
+    current_timestamp, generate_next_title, load_config_or_default, load_json, resolve_title,
+    send_ipc_command, update_default_note_size, CloseAction, Config, CornerStyle, IpcCommand,
+    IpcServer, Note, NoteColor, NotesDocument, StorageEngine,
 };
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -97,6 +97,11 @@ fn create_and_show_note_window(
         CornerStyle::Curled => "curled".into(),
         CornerStyle::Flat => "flat".into(),
     });
+    window.set_font_family(app.config.note_appearance.font_family.clone().into());
+    window.set_font_size(app.config.note_appearance.font_size as f32);
+    window.set_is_bold(note.is_bold);
+    window.set_is_italic(note.is_italic);
+    window.set_is_underlined(note.is_underlined);
     apply_theme(&window, note.color);
 
     #[cfg(windows)]
@@ -313,18 +318,87 @@ fn create_and_show_note_window(
 
         window.on_format_requested(move |fmt| {
             if let Some(w) = window_weak.upgrade() {
-                let current = w.get_note_content();
-                let formatted = apply_text_formatting(current.as_str(), fmt.as_str());
-                w.set_note_content(formatted.clone().into());
-
-                APP.with(|app_cell| {
-                    if let Some(ref mut app) = *app_cell.borrow_mut() {
-                        if let Some(session) = app.sessions.get_mut(&note_id_for_format) {
-                            session.note.content = formatted;
+                match fmt.as_str() {
+                    "bold" => {
+                        let new_val = !w.get_is_bold();
+                        w.set_is_bold(new_val);
+                        APP.with(|app_cell| {
+                            if let Some(ref mut app) = *app_cell.borrow_mut() {
+                                if let Some(session) = app.sessions.get_mut(&note_id_for_format) {
+                                    session.note.is_bold = new_val;
+                                }
+                            }
+                        });
+                        schedule_save();
+                    }
+                    "italic" => {
+                        let new_val = !w.get_is_italic();
+                        w.set_is_italic(new_val);
+                        APP.with(|app_cell| {
+                            if let Some(ref mut app) = *app_cell.borrow_mut() {
+                                if let Some(session) = app.sessions.get_mut(&note_id_for_format) {
+                                    session.note.is_italic = new_val;
+                                }
+                            }
+                        });
+                        schedule_save();
+                    }
+                    "underline" => {
+                        let new_val = !w.get_is_underlined();
+                        w.set_is_underlined(new_val);
+                        APP.with(|app_cell| {
+                            if let Some(ref mut app) = *app_cell.borrow_mut() {
+                                if let Some(session) = app.sessions.get_mut(&note_id_for_format) {
+                                    session.note.is_underlined = new_val;
+                                }
+                            }
+                        });
+                        schedule_save();
+                    }
+                    "bullet" => {
+                        let current = w.get_note_content().to_string();
+                        let updated = if current.is_empty() {
+                            "• ".to_string()
+                        } else {
+                            current
+                                .lines()
+                                .map(|line| {
+                                    let trimmed = line.trim_start();
+                                    if let Some(rest) = trimmed.strip_prefix("• ") {
+                                        rest.to_string()
+                                    } else if let Some(rest) = trimmed.strip_prefix("- ") {
+                                        rest.to_string()
+                                    } else {
+                                        format!("• {line}")
+                                    }
+                                })
+                                .collect::<Vec<String>>()
+                                .join("\n")
+                        };
+                        w.set_note_content(updated.clone().into());
+                        APP.with(|app_cell| {
+                            if let Some(ref mut app) = *app_cell.borrow_mut() {
+                                if let Some(session) = app.sessions.get_mut(&note_id_for_format) {
+                                    session.note.content = updated;
+                                }
+                            }
+                        });
+                        schedule_save();
+                    }
+                    "font-larger" => {
+                        let cur = w.get_font_size();
+                        if cur < 32.0 {
+                            w.set_font_size(cur + 2.0);
                         }
                     }
-                });
-                schedule_save();
+                    "font-smaller" => {
+                        let cur = w.get_font_size();
+                        if cur > 10.0 {
+                            w.set_font_size(cur - 2.0);
+                        }
+                    }
+                    _ => {}
+                }
             }
         });
     }
@@ -454,18 +528,10 @@ fn create_and_show_note_window(
     #[cfg(windows)]
     {
         unsafe {
-            stealth_and_sink_all_process_windows();
+            for hwnd in sticky_note_core::find_process_windows() {
+                sticky_note_core::apply_stealth_window_styles(hwnd);
+            }
         }
-        slint::Timer::single_shot(std::time::Duration::from_millis(50), || {
-            unsafe {
-                stealth_and_sink_all_process_windows();
-            }
-        });
-        slint::Timer::single_shot(std::time::Duration::from_millis(150), || {
-            unsafe {
-                stealth_and_sink_all_process_windows();
-            }
-        });
     }
 
     app.sessions.insert(
@@ -534,6 +600,9 @@ fn spawn_note(
         created_at: current_timestamp(),
         updated_at: current_timestamp(),
         is_closed: false,
+        is_bold: false,
+        is_italic: false,
+        is_underlined: false,
     };
 
     {
@@ -633,9 +702,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             match cmd {
                                 IpcCommand::NewNote => {
                                     let _ = spawn_note(app, None);
+                                    #[cfg(windows)]
+                                    unsafe {
+                                        sticky_note_core::bring_all_process_windows_to_front();
+                                    }
                                 }
                                 IpcCommand::OpenFile(path) => {
                                     let _ = open_note_from_file(app, &path);
+                                    #[cfg(windows)]
+                                    unsafe {
+                                        sticky_note_core::bring_all_process_windows_to_front();
+                                    }
                                 }
                                 IpcCommand::ReloadConfig => {
                                     reload_config(app);
@@ -687,6 +764,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )?;
             }
         }
+    }
+
+    #[cfg(windows)]
+    unsafe {
+        sticky_note_core::bring_all_process_windows_to_front();
     }
 
     APP.with(|app_cell| {

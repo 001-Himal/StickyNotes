@@ -42,13 +42,26 @@ impl IpcCommand {
     }
 }
 
+/// Returns directory-scoped IPC socket name to prevent cross-directory instance hijacking.
+pub fn get_ipc_socket_name() -> String {
+    let base = std::env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(|d| d.to_string_lossy().to_string()))
+        .unwrap_or_else(|| "default".to_string());
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    std::hash::Hash::hash(&base, &mut hasher);
+    let hash = std::hash::Hasher::finish(&hasher);
+    format!("StickyNote_IPC_{:016x}", hash)
+}
+
 /// Send a command to the primary running instance.
 /// Returns Ok(true) if connected and delivered, or Ok(false) if no instance is running.
 pub fn send_ipc_command(cmd: &IpcCommand) -> io::Result<bool> {
     use interprocess::local_socket::prelude::*;
     use interprocess::local_socket::{GenericNamespaced, Stream, ToNsName};
 
-    let name = match IPC_SOCKET_NAME.to_ns_name::<GenericNamespaced>() {
+    let sock_name = get_ipc_socket_name();
+    let name = match sock_name.as_str().to_ns_name::<GenericNamespaced>() {
         Ok(n) => n,
         Err(e) => return Err(io::Error::new(io::ErrorKind::InvalidInput, e)),
     };
@@ -77,7 +90,8 @@ impl IpcServer {
     pub fn bind() -> io::Result<Option<Self>> {
         use interprocess::local_socket::{GenericNamespaced, ListenerOptions, ToNsName};
 
-        let name = match IPC_SOCKET_NAME.to_ns_name::<GenericNamespaced>() {
+        let sock_name = get_ipc_socket_name();
+        let name = match sock_name.as_str().to_ns_name::<GenericNamespaced>() {
             Ok(n) => n,
             Err(e) => return Err(io::Error::new(io::ErrorKind::InvalidInput, e)),
         };

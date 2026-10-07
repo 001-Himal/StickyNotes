@@ -14,6 +14,9 @@ pub fn find_process_windows() -> Vec<usize> {
 /// Applies stealth and sinks all process windows (stub).
 pub fn stealth_and_sink_all_process_windows() {}
 
+/// Brings all process windows to front (stub).
+pub fn bring_all_process_windows_to_front() {}
+
 /// Clamps coordinates to monitor bounds (stub).
 pub fn clamp_to_monitor_bounds(x: i32, y: i32, _width: u32, _height: u32) -> (i32, i32) {
     (x, y)
