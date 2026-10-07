@@ -13,9 +13,10 @@ Provide a minimal, on-demand configuration executable (`Sticky Note Settings`) t
   "note_appearance": {
     "last_used_width": 300,
     "last_used_height": 200,
+    "corner_style": "curled",
     "font_family": "Segoe UI",
     "font_size": 14,
-    "default_color": "#FFF8D6"
+    "default_color": "yellow"
   },
   "behavior": {
     "close_action": "ask",
@@ -38,7 +39,9 @@ Provide a minimal, on-demand configuration executable (`Sticky Note Settings`) t
 3. **Preferences Managed**:
    - **Close Button Action**: Radio options (`delete` permanently, `close` and keep saved, `ask` each time).
    - **General**: Launch on OS startup toggle.
-   - **Appearance**: Font family, font size, default color.
+   - **Appearance**:
+     - **Corner Style:** Curled / Bended corner (Classic) vs. Flat corner (Modern).
+     - Font family, font size, default color.
    - **Shortcuts**: Key combinations for New Note and Open Settings.
 4. **Dynamic Size Inheritance**:
    - Whenever any note is resized by the user, `last_used_width` and `last_used_height` in `config.json` update automatically. New notes instantiate using these dimensions. No static presets dropdown.

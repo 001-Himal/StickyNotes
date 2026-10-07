@@ -58,6 +58,7 @@ Sticky Note/
 | **Taskbar / Switcher** | Excluded from Windows Taskbar, macOS Dock, and Alt+Tab / Cmd+Tab app switchers (`WS_EX_TOOLWINDOW`). |
 | **Movement** | Dragging from anywhere on the header moves the window smoothly across monitors. |
 | **Resizing & Dynamic Inheritance** | Hovering over the bottom-right corner reveals the resize grip. Dragging resizes the note (min: 180×120). **Crucial Sizing Rule:** Whenever a user resizes any note, that new `(width, height)` is automatically remembered as the default dimensions for all subsequently spawned notes. No static size presets in settings. |
+| **Bottom-Right Corner Appearance** | Features an authentic **bended / curled paper corner** (dog-ear curl look with soft drop-shadow) simulating physical paper, or clean **flat** corner. Togglable in `Sticky Note Settings`. |
 | **Per-Note Geometry Persistence** | Each note saves its own exact `(x, y, width, height)` in `Notes.json` so every note reopens exactly as placed. |
 
 ### 4.2. Header, Quick-Add & Title Behavior
@@ -75,13 +76,13 @@ Sticky Note/
 ### 4.3. Text Area, 6-Color Palette & Keyboard Formatting
 
 - **Zero Clutter:** Pure text editing surface. Zero permanent toolbars, buttons, or ribbons.
-- **Right-Click 6-Color Pastel Palette:** Right-clicking anywhere on the note opens a compact context menu offering 6 classic pastel colors:
-  1. 🟨 **Canary Yellow** (`#FFF8D6`, Header: `#F5E8A9`) — Default
-  2. 🟩 **Mint Green** (`#E8F5E9`, Header: `#C8E6C9`)
-  3. 🟦 **Sky Blue** (`#E3F2FD`, Header: `#BBDEFB`)
-  4. 🟪 **Lavender** (`#F3E5F5`, Header: `#E1BEE7`)
-  5. 🌸 **Soft Pink** (`#FFEBEE`, Header: `#FFCDD2`)
-  6. ⬜ **Clean White** (`#FFFFFF`, Header: `#F0F0F0`)
+- **Right-Click 6-Color Pastel Palette:** Right-clicking anywhere on the note opens a compact context menu offering 6 classic Windows 7 palettes (darker header, lighter body):
+  1. 🟦 **Blue:** Light blue header (`#8FD1F4`) with pale blue main body (`#C2E6F8`)
+  2. 🟩 **Green:** Soft green header (`#B2E89D`) with pale green main body (`#D8F6C8`)
+  3. 🌸 **Pink:** Lavender/pink header (`#F5ABC9`) with pale pink main body (`#FCD7E7`)
+  4. 🟪 **Purple:** Purple header (`#CEA8ED`) with pale purple main body (`#EAD8FA`)
+  5. ⬜ **White:** Light gray header (`#DCDCDC`) with crisp white main body (`#FFFFFF`)
+  6. 🟨 **Yellow (Default):** Muted yellow header (`#F6E077`) with light yellow main body (`#FDF1B0`), with `+` top-left and `x` top-right
   *The chosen color is saved individually with that note in `Notes.json`.*
 - **Keyboard-Only Formatting (Zero Toolbars):**
   - `Ctrl + B`: Bold text toggle
@@ -107,6 +108,7 @@ A minimal, small popup window designed with the **exact same pastel paper aesthe
 2. **General:**
    - Launch on system startup (Toggle).
 3. **Appearance:**
+   - **Corner Style:** Curled / Bended corner (Classic) vs. Flat corner (Modern).
    - Font family and font size.
    - Default note color choice.
 4. **Shortcuts:**

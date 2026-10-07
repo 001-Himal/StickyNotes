@@ -18,6 +18,7 @@ Rather than appearing as a harsh grey system dialog, the Settings window is styl
 2. **General:**
    - [x] Launch Sticky Note on Windows/OS startup
 3. **Appearance:**
+   - **Corner Style:** Curled / Bended corner (Classic) vs. Flat corner (Modern)
    - Font family dropdown (System native sans-serif fonts)
    - Font size slider (12px to 20px)
    - Default note color picker (6 pastel swatches)
