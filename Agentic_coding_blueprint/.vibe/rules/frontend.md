@@ -1,7 +1,8 @@
-# frontend.md
+# frontend.md (Slint Desktop UI)
 
-- Reuse the design system — never invent ad-hoc styles.
-- Every screen handles loading/empty/error.
-- Mobile-first and usable at small widths.
-- Accessibility: semantic HTML, keyboard nav, alt text, contrast.
-- User-centric copy only: Never reveal tech stack, database vendors, auth providers, or protocols in UI text (e.g., no "Powered by Neon PostgreSQL", "Supabase Auth", "Quick Match • WebSocket", "Real-time matchmaking"). Statuses and loaders must describe user actions ("Finding match...", "Saving..."), never plumbing ("WebSocket connecting...", "Executing query...").
+- Adhere strictly to the Slint design system in `.vibe/product/design-system.md`.
+- Micro-interactions: Controls ('X' close button and resize grip) must reveal ONLY on hover over their respective zones.
+- Keep the note surface pristine: Zero permanent toolbars, buttons, or menus on the note body.
+- Typography: Use system fonts with high legibility and soft contrast (charcoal on warm canary yellow).
+- Window behavior: Never force always-on-top; notes must reside quietly on the desktop layer beneath normal apps.
+- User-centric copy: Never expose internal technical plumbing or errors in note text.

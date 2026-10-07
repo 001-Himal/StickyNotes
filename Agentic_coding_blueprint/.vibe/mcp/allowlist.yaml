@@ -1,6 +1,0 @@
-allowed_servers:
-  - github
-blocked:
-  - email
-  - payments
-  - production-admin

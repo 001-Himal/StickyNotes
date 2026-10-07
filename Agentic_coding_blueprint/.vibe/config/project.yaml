@@ -1,4 +1,6 @@
-name: <project-name>
+name: Sticky Note
 version: 0.1.0
-description: <one-liner>
-owner: <name>
+description: A lightweight, native desktop sticky note utility behaving like physical paper on the OS desktop.
+owner: Himal
+license: MIT
+repository: https://github.com/001-Himal/StickyNotes.git

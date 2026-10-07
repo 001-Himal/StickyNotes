@@ -1,5 +1,10 @@
-src: src/
+crates:
+  core: crates/sticky-note-core/
+  app: crates/sticky-note/
+  settings: crates/sticky-note-settings/
+ui: ui/
 tests: tests/
 docs: docs/
 scripts: scripts/
-public: public/
+storage: "Sticky Note Notes/"
+config: config.json

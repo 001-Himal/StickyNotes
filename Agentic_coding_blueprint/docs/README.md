@@ -1,15 +1,10 @@
-# docs/
+# Sticky Note Documentation (`docs/`)
 
-Human-readable project documentation. Keep it accurate, not exhaustive.
+Human-readable project documentation for developers, contributors, and maintainers.
 
-- product/ — vision, requirements, personas, use-cases
-- architecture/ — overview, system-design, data-flow, integrations, diagrams/
-- development/ — setup, development, environment, troubleshooting
-- API/ — API docs, endpoints/
-- database/ — schema, relationships, migrations
-- frontend/ — design-system, components, ui-guidelines
-- backend/ — backend notes
-- deployment/ — deployment, infrastructure, rollback
-- operations/ — monitoring, logging, alerts, incident-response, backups, disaster-recovery
-- security/ — security documentation
-- guides/ — contributing, faq
+- **product/** — Vision, PRD requirements, personas, and user cases.
+- **architecture/** — System overview, data flow, window management layer, and architecture diagrams.
+- **development/** — Rust & Slint toolchain setup, build commands, and debugging workflow.
+- **frontend/** — Slint component design system, micro-interactions, and styling guidelines.
+- **security/** — Offline trust boundary, local-only threat model, and zero-network guarantees.
+- **guides/** — Contributing guide, shortcut cheatsheet, and FAQ.

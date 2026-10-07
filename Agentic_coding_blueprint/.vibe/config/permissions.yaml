@@ -3,12 +3,13 @@ allow:
   - read_files
   - edit_code
   - run_tests
+  - run_clippy
 ask:
-  - install_dependency
+  - add_dependency
   - modify_protected_files
-  - database_migration
-  - deploy
+  - change_storage_format
 deny:
-  - read_secrets
+  - introduce_network_calls
+  - add_cloud_telemetry
+  - read_user_private_data
   - force_push
-  - access_production

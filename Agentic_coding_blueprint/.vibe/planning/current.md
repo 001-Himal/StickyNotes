@@ -1,16 +1,10 @@
-# current.md — active work
+# current.md
 
-## Active FEAT-ID
+## Current Focus
+- Session: Initial Planning, blueprint pruning, and architecture specification.
+- Status: Blueprint fully tailored and pruned. PRD, schemas, specifications, and tasks established. Ready for implementation kickoff whenever scheduled.
 
-## Status checklist
-- [ ] Spec
-- [ ] Research (if needed)
-- [ ] Plan approved
-- [ ] Implemented
-- [ ] Verified (build/typecheck/lint/tests)
-- [ ] Diff review
-- [ ] Security review
-- [ ] Docs updated
-- [ ] Changelog
-
-## Next steps
+## Next Up
+- Initialize Cargo workspace (`Cargo.toml`).
+- Create `crates/sticky-note-core/` with `Note` and `Config` models.
+- Create `crates/sticky-note/` with basic Slint `NoteWindow`.

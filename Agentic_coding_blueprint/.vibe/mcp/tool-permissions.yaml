@@ -1,4 +1,0 @@
-permissions:
-  github:
-    read: true
-    write: false

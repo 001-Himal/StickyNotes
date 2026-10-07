@@ -1,5 +1,7 @@
-dev: npm run dev
-build: npm run build
-test: npm test
-lint: npm run lint
-typecheck: npm run typecheck
+dev: cargo run --bin sticky-note
+dev-settings: cargo run --bin sticky-note-settings
+build: cargo build --release
+test: cargo test
+lint: cargo clippy -- -D warnings
+format: cargo fmt --check
+typecheck: cargo check
