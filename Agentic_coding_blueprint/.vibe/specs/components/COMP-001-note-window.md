@@ -3,25 +3,26 @@
 ## Purpose
 The primary frameless container representing an individual sticky note on the OS desktop.
 
-## Geometry & Multi-Size Presets
-The window must seamlessly accommodate varying dimensions, from compact scratchpads to expansive workspace notes:
+## Sizing & Dynamic Dimensions Inheritance
+- **No Static Size Presets:** The app does not force fixed preset sizes.
+- **Dynamic Inheritance:** Whenever a user resizes any note via the corner grip, that new dimension `(width, height)` is stored as the current default size in `config.json`. The next newly spawned note automatically adopts this exact size.
+- **Individual Note Geometry:** Each note independently saves its own `(x, y, width, height)` in `Notes.json`.
+- **Minimum Clamping:** `min-width: 180px`, `min-height: 120px`. Maximum bounded only by current display workspace.
 
-| Size Preset | Dimensions (W × H) | Best Use Case |
-|---|---|---|
-| **Compact / Tiny** | 200 × 140 px | Single reminders, quick phone numbers, one-liners |
-| **Standard / Medium (Default)** | 300 × 200 px | Daily to-do lists, short paragraphs, meeting snippets |
-| **Expanded / Large** | 420 × 320 px | Detailed instructions, multi-step checklists, extensive notes |
-| **Freeform Resizing** | Min: 180 × 120 px, Max: Display bounds | User-adjusted via bottom-right grip |
+## 6-Color Pastel Palette Themes
+Each note can display one of 6 classic pastel themes (selectable via right-click context menu):
+
+| Color | Body Tone | Header Bar Tone | Text Tone |
+|---|---|---|---|
+| **Canary Yellow (Default)** | `#FFF8D6` | `#F5E8A9` | `#2B2B2B` |
+| **Mint Green** | `#E8F5E9` | `#C8E6C9` | `#20382B` |
+| **Sky Blue** | `#E3F2FD` | `#BBDEFB` | `#1A334E` |
+| **Lavender** | `#F3E5F5` | `#E1BEE7` | `#392042` |
+| **Soft Pink** | `#FFEBEE` | `#FFCDD2` | `#4A1E24` |
+| **Crisp White** | `#FFFFFF` | `#F0F0F0` | `#2B2B2B` |
 
 ## Visual Structure
-- Outer container: Frameless, border radius 4px, subtle ambient shadow.
-- Header region (top 28px): Contains title and hover 'X'.
-- Body region: Fills remaining vertical height.
-- Footer corner: 20×20px interactive resize zone.
-
-## States
-- `Normal`: Ambient display on desktop, header and body text visible.
-- `HeaderHover`: 'X' close button opacity transitions from 0.0 to 1.0.
-- `CornerHover`: Resize grip opacity transitions from 0.0 to 1.0; cursor changes to `nwse-resize`.
-- `EditingTitle`: Header title swaps to inline input field.
-- `Focused`: Text caret active in body area.
+- Outer container: Frameless, border-radius 4px, subtle ambient shadow.
+- Header bar: Top 28px height (contains `+` quick-add, title label, and `X` close).
+- Body editor: Flexible height fill.
+- Corner resize handle: Bottom-right 20×20px hover hit area.

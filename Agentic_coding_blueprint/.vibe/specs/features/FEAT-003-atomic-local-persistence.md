@@ -17,6 +17,7 @@ Store all notes locally within `Sticky Note Notes/Notes.json` with 100% data int
       "y": 180,
       "width": 300,
       "height": 220,
+      "color": "yellow",
       "created_at": 1728280000,
       "updated_at": 1728280050,
       "is_closed": false

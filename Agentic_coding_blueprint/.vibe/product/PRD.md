@@ -49,7 +49,7 @@ Sticky Note/
 
 ## 4. Feature Specifications
 
-### 4.1. Note Window Behavior & Lifecycle
+### 4.1. Note Window Behavior & Sizing
 
 | Feature | Specification |
 |---|---|
@@ -57,45 +57,61 @@ Sticky Note/
 | **Window Chrome** | Frameless/borderless window with subtle soft shadow. No OS caption bar. |
 | **Taskbar / Switcher** | Excluded from Windows Taskbar, macOS Dock, and Alt+Tab / Cmd+Tab app switchers (`WS_EX_TOOLWINDOW`). |
 | **Movement** | Dragging from anywhere on the header moves the window smoothly across monitors. |
-| **Resizing** | Hovering over the bottom-right corner reveals the resize grip; dragging resizes the note (minimum dimensions: 180×120). |
-| **Position Memory** | Note coordinates `(x, y)` and dimensions `(width, height)` persist across reboots. |
+| **Resizing & Dynamic Inheritance** | Hovering over the bottom-right corner reveals the resize grip. Dragging resizes the note (min: 180×120). **Crucial Sizing Rule:** Whenever a user resizes any note, that new `(width, height)` is automatically remembered as the default dimensions for all subsequently spawned notes. No static size presets in settings. |
+| **Per-Note Geometry Persistence** | Each note saves its own exact `(x, y, width, height)` in `Notes.json` so every note reopens exactly as placed. |
 
-### 4.2. Header & Title Behavior
+### 4.2. Header, Quick-Add & Title Behavior
 
-- **Automatic Sequential Naming:** Newly created notes are automatically titled `"Untitled Note 1"`. If that title already exists in `Notes.json`, it increments to `"Untitled Note 2"`, `"Untitled Note 3"`, etc.
-- **Double-Click Inline Rename:** Double-clicking the header replaces the title text with an inline input field. Pressing `Enter` or clicking outside commits the new title.
-- **Hover Close Button ('X'):**
-  - Completely invisible during normal display.
-  - Reveals instantly when hovering over the header's top-right region.
-  - Behavior when clicked follows user preference configured in Settings (Delete vs. Close vs. Hide).
+- **Hover Header Controls:** Both the top-left `+` button and top-right `X` button are hidden by default, smoothly fading into view only when hovering over the header area.
+- **Top-Left `+` Button:** Clicking `+` instantly creates and cascades a new sticky note directly next to the current one.
+- **Top-Right `X` Button (Configurable):**
+  - Configurable via `Sticky Note Settings`:
+    1. **Delete Note:** Instantly removes the note from disk.
+    2. **Close & Save:** Hides the note window while preserving its contents safely in `Notes.json`.
+    3. **Ask on Click:** Displays a tiny, themed confirmation prompt: *"Delete note or just close?"*
+- **Automatic Sequential Naming:** Newly created notes are titled `"Untitled Note 1"`, incrementing to `"Untitled Note 2"`, etc., if already taken.
+- **Double-Click Inline Rename:** Double-clicking the header replaces the title text with an inline input field. Pressing `Enter` commits the new title; `Escape` cancels.
 
-### 4.3. Text Area & Editing
+### 4.3. Text Area, 6-Color Palette & Keyboard Formatting
 
-- **Zero Clutter:** Pure text editing surface. Click anywhere to position cursor and type.
-- **Auto-Save:** Keystrokes are buffered and debounced (300ms) before committing atomically to `Notes.json`. No manual save dialogs or Ctrl+S required.
-- **Default Appearance:** Classic pastel sticky paper tones (warm yellow `#FFF7D1` default, configurable palette) with legible native typography (Segoe UI, SF Pro, Inter).
+- **Zero Clutter:** Pure text editing surface. Zero permanent toolbars, buttons, or ribbons.
+- **Right-Click 6-Color Pastel Palette:** Right-clicking anywhere on the note opens a compact context menu offering 6 classic pastel colors:
+  1. 🟨 **Canary Yellow** (`#FFF8D6`, Header: `#F5E8A9`) — Default
+  2. 🟩 **Mint Green** (`#E8F5E9`, Header: `#C8E6C9`)
+  3. 🟦 **Sky Blue** (`#E3F2FD`, Header: `#BBDEFB`)
+  4. 🟪 **Lavender** (`#F3E5F5`, Header: `#E1BEE7`)
+  5. 🌸 **Soft Pink** (`#FFEBEE`, Header: `#FFCDD2`)
+  6. ⬜ **Clean White** (`#FFFFFF`, Header: `#F0F0F0`)
+  *The chosen color is saved individually with that note in `Notes.json`.*
+- **Keyboard-Only Formatting (Zero Toolbars):**
+  - `Ctrl + B`: Bold text toggle
+  - `Ctrl + I`: Italic text toggle
+  - `Ctrl + U`: Underline text toggle
+  - `Ctrl + L`: Bullet list / alignment toggle
+- **Auto-Save:** Keystrokes are buffered and debounced (300ms) before committing atomically to `Notes.json`.
 
 ### 4.4. Global Shortcuts
 
 Registered system-wide so users can invoke actions even while working inside other applications:
-- **`Ctrl + Alt + N` (or `Cmd + Alt + N`):** Instantly spawns a new Sticky Note centered or cascading on the desktop.
+- **`Ctrl + Alt + N` (or `Cmd + Alt + N`):** Instantly spawns a new Sticky Note on the desktop.
 - **`Ctrl + Alt + S` (or `Cmd + Alt + S`):** Opens `Sticky Note Settings`.
 
 ### 4.5. Settings Utility (`Sticky Note Settings`)
 
-A compact, native preferences window containing:
-1. **General:**
+A minimal, small popup window designed with the **exact same pastel paper aesthetic** as the sticky notes (not a standard gray dialog!):
+
+1. **Close Button ('X') Action:**
+   - ○ Delete note permanently
+   - ○ Close and keep saved in `Notes.json`
+   - ● Ask each time on click (*"Delete or just close?"*)
+2. **General:**
    - Launch on system startup (Toggle).
-   - Confirm before deleting note (Toggle).
-2. **Note Appearance:**
-   - Default note dimensions (Width × Height, default 300 × 200).
+3. **Appearance:**
    - Font family and font size.
-   - Default sticky note color.
-3. **Behavior:**
-   - Close button ('X') action: `Delete Note` | `Close Note` | `Hide Note`.
-   - Auto-save debounce interval.
+   - Default note color choice.
 4. **Shortcuts:**
-   - Custom keybinding rebinding for New Note and Open Settings.
+   - Display & edit global shortcuts for New Note and Settings.
+*(Note: No static size presets; no trash recovery engine).*
 
 ---
 
