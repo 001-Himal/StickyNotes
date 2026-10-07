@@ -1,4 +1,0 @@
-# map.md
-
-| Document | Covers |
-|---|---|
