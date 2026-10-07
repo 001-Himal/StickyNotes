@@ -1,8 +1,439 @@
+// Copyright (c) 2026 Sticky Note Contributors
+// SPDX-License-Identifier: MIT
+
+import { Button, CheckBox, LineEdit } from "std-widgets.slint";
+
+component OptionButton inherits Rectangle {
+    in property <string> text;
+    in property <bool> selected: false;
+    callback clicked();
+
+    height: 26px;
+    border-radius: 4px;
+    background: root.selected ? #2B2B2B : (touch.has-hover ? #00000018 : #0000000D);
+    border-width: 1px;
+    border-color: root.selected ? #2B2B2B : #00000020;
+
+    animate background { duration: 100ms; }
+
+    HorizontalLayout {
+        padding-left: 8px;
+        padding-right: 8px;
+        alignment: center;
+        Text {
+            text: root.text;
+            font-size: 11px;
+            font-weight: 600;
+            color: root.selected ? #FFFFFF : #2B2B2B;
+            vertical-alignment: center;
+        }
+    }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}
+
+component ColorCircle inherits Rectangle {
+    in property <color> swatch-color;
+    in property <string> color-name;
+    in property <bool> is-selected: false;
+    callback selected(string);
+
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    background: root.swatch-color;
+    border-width: root.is-selected ? 2px : 1px;
+    border-color: root.is-selected ? #2B2B2B : #00000030;
+    drop-shadow-blur: touch.has-hover ? 3px : 1px;
+    drop-shadow-color: #00000020;
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.selected(root.color-name); }
+    }
+}
+
 export component SettingsWindow inherits Window {
     title: "Sticky Note Settings";
-    width: 380px;
-    height: 320px;
-    default-font-family: "Segoe UI";
+    preferred-width: 400px;
+    preferred-height: 490px;
+    min-width: 400px;
+    min-height: 490px;
     no-frame: true;
-    background: #FDF1B0;
+    background: transparent;
+    default-font-family: "Segoe UI";
+
+    // Configuration properties
+    in-out property <string> close-action: "ask"; // "ask", "close", "delete"
+    in-out property <string> corner-style: "curled"; // "curled", "flat"
+    in-out property <string> default-color: "yellow";
+    in-out property <bool> start-with-os: false;
+    in-out property <string> shortcut-new-note: "Ctrl+Alt+N";
+    in-out property <string> shortcut-settings: "Ctrl+Alt+S";
+    in-out property <int> font-size-pt: 14;
+
+    // Callbacks to Rust
+    callback close-clicked();
+    callback close-action-changed(string);
+    callback corner-style-changed(string);
+    callback default-color-changed(string);
+    callback start-with-os-changed(bool);
+    callback shortcut-new-note-changed(string);
+    callback shortcut-settings-changed(string);
+    callback font-size-changed(int);
+    callback window-drag-delta(length, length);
+
+    card := Rectangle {
+        width: 100%;
+        height: 100%;
+        background: #FDF1B0;
+        border-radius: 6px;
+        clip: true;
+        border-width: 1px;
+        border-color: #00000020;
+        drop-shadow-blur: 12px;
+        drop-shadow-color: #00000035;
+
+        VerticalLayout {
+            padding: 0px;
+            spacing: 0px;
+
+            // ==========================================
+            // HEADER BAR (Draggable)
+            // ==========================================
+            header := Rectangle {
+                height: 28px;
+                background: #F6E077;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+
+                TouchArea {
+                    moved => {
+                        if (self.pressed) {
+                            root.window-drag-delta(self.mouse-x - self.pressed-x, self.mouse-y - self.pressed-y);
+                        }
+                    }
+                }
+
+                Text {
+                    x: 12px;
+                    text: "Sticky Note Settings";
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #2B2B2B;
+                    vertical-alignment: center;
+                }
+
+                close-btn := Rectangle {
+                    x: parent.width - 26px;
+                    y: 4px;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 3px;
+                    background: close-touch.has-hover ? #E81123 : transparent;
+
+                    Text {
+                        text: "✕";
+                        font-size: 11px;
+                        font-weight: 600;
+                        color: close-touch.has-hover ? #FFFFFF : #2B2B2B;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+
+                    close-touch := TouchArea {
+                        mouse-cursor: pointer;
+                        clicked => {
+                            root.close-clicked();
+                        }
+                    }
+                }
+            }
+
+            // ==========================================
+            // SETTINGS CONTENT BODY
+            // ==========================================
+            VerticalLayout {
+                padding: 16px;
+                spacing: 14px;
+
+                // 1. Close Button Behavior
+                VerticalLayout {
+                    spacing: 6px;
+                    Text {
+                        text: "When clicking 'X' on a note:";
+                        font-size: 11px;
+                        font-weight: 600;
+                        color: #2B2B2B;
+                    }
+                    HorizontalLayout {
+                        spacing: 8px;
+                        OptionButton {
+                            text: "Ask Prompt";
+                            selected: root.close-action == "ask";
+                            clicked => {
+                                root.close-action = "ask";
+                                root.close-action-changed("ask");
+                            }
+                        }
+                        OptionButton {
+                            text: "Close & Save";
+                            selected: root.close-action == "close";
+                            clicked => {
+                                root.close-action = "close";
+                                root.close-action-changed("close");
+                            }
+                        }
+                        OptionButton {
+                            text: "Delete Note";
+                            selected: root.close-action == "delete";
+                            clicked => {
+                                root.close-action = "delete";
+                                root.close-action-changed("delete");
+                            }
+                        }
+                    }
+                }
+
+                // 2. Corner Style
+                VerticalLayout {
+                    spacing: 6px;
+                    Text {
+                        text: "Bottom-Right Corner Appearance:";
+                        font-size: 11px;
+                        font-weight: 600;
+                        color: #2B2B2B;
+                    }
+                    HorizontalLayout {
+                        spacing: 8px;
+                        OptionButton {
+                            text: "Curled Dog-Ear";
+                            selected: root.corner-style == "curled";
+                            clicked => {
+                                root.corner-style = "curled";
+                                root.corner-style-changed("curled");
+                            }
+                        }
+                        OptionButton {
+                            text: "Modern Flat";
+                            selected: root.corner-style == "flat";
+                            clicked => {
+                                root.corner-style = "flat";
+                                root.corner-style-changed("flat");
+                            }
+                        }
+                    }
+                }
+
+                // 3. Default Paper Color
+                VerticalLayout {
+                    spacing: 6px;
+                    Text {
+                        text: "Default Note Palette:";
+                        font-size: 11px;
+                        font-weight: 600;
+                        color: #2B2B2B;
+                    }
+                    HorizontalLayout {
+                        spacing: 10px;
+                        alignment: start;
+
+                        ColorCircle {
+                            swatch-color: #FDF1B0;
+                            color-name: "yellow";
+                            is-selected: root.default-color == "yellow";
+                            selected(c) => {
+                                root.default-color = c;
+                                root.default-color-changed(c);
+                            }
+                        }
+                        ColorCircle {
+                            swatch-color: #C2E6F8;
+                            color-name: "blue";
+                            is-selected: root.default-color == "blue";
+                            selected(c) => {
+                                root.default-color = c;
+                                root.default-color-changed(c);
+                            }
+                        }
+                        ColorCircle {
+                            swatch-color: #D8F6C8;
+                            color-name: "green";
+                            is-selected: root.default-color == "green";
+                            selected(c) => {
+                                root.default-color = c;
+                                root.default-color-changed(c);
+                            }
+                        }
+                        ColorCircle {
+                            swatch-color: #FCD7E7;
+                            color-name: "pink";
+                            is-selected: root.default-color == "pink";
+                            selected(c) => {
+                                root.default-color = c;
+                                root.default-color-changed(c);
+                            }
+                        }
+                        ColorCircle {
+                            swatch-color: #EAD8FA;
+                            color-name: "purple";
+                            is-selected: root.default-color == "purple";
+                            selected(c) => {
+                                root.default-color = c;
+                                root.default-color-changed(c);
+                            }
+                        }
+                        ColorCircle {
+                            swatch-color: #FFFFFF;
+                            color-name: "white";
+                            is-selected: root.default-color == "white";
+                            selected(c) => {
+                                root.default-color = c;
+                                root.default-color-changed(c);
+                            }
+                        }
+                    }
+                }
+
+                // 4. Text Font Size
+                VerticalLayout {
+                    spacing: 6px;
+                    Text {
+                        text: "Note Text Size:";
+                        font-size: 11px;
+                        font-weight: 600;
+                        color: #2B2B2B;
+                    }
+                    HorizontalLayout {
+                        spacing: 8px;
+                        alignment: start;
+
+                        Rectangle {
+                            width: 26px;
+                            height: 26px;
+                            border-radius: 4px;
+                            background: min-touch.has-hover ? #00000020 : #0000000E;
+                            Text {
+                                text: "-";
+                                font-size: 14px;
+                                font-weight: 700;
+                                color: #2B2B2B;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                            min-touch := TouchArea {
+                                mouse-cursor: pointer;
+                                clicked => {
+                                    if (root.font-size-pt > 10) {
+                                        root.font-size-pt -= 1;
+                                        root.font-size-changed(root.font-size-pt);
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            width: 60px;
+                            height: 26px;
+                            border-radius: 4px;
+                            background: #00000008;
+                            Text {
+                                text: root.font-size-pt + " pt";
+                                font-size: 12px;
+                                font-weight: 600;
+                                color: #2B2B2B;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+
+                        Rectangle {
+                            width: 26px;
+                            height: 26px;
+                            border-radius: 4px;
+                            background: pls-touch.has-hover ? #00000020 : #0000000E;
+                            Text {
+                                text: "+";
+                                font-size: 14px;
+                                font-weight: 700;
+                                color: #2B2B2B;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                            pls-touch := TouchArea {
+                                mouse-cursor: pointer;
+                                clicked => {
+                                    if (root.font-size-pt < 28) {
+                                        root.font-size-pt += 1;
+                                        root.font-size-changed(root.font-size-pt);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 5. Global Shortcuts
+                VerticalLayout {
+                    spacing: 6px;
+                    Text {
+                        text: "System Global Shortcuts:";
+                        font-size: 11px;
+                        font-weight: 600;
+                        color: #2B2B2B;
+                    }
+                    HorizontalLayout {
+                        spacing: 12px;
+                        VerticalLayout {
+                            spacing: 3px;
+                            Text {
+                                text: "New Note:";
+                                font-size: 10px;
+                                color: #2B2B2B80;
+                            }
+                            new-inp := LineEdit {
+                                text <=> root.shortcut-new-note;
+                                height: 26px;
+                                accepted => {
+                                    root.shortcut-new-note-changed(self.text);
+                                }
+                            }
+                        }
+                        VerticalLayout {
+                            spacing: 3px;
+                            Text {
+                                text: "Settings:";
+                                font-size: 10px;
+                                color: #2B2B2B80;
+                            }
+                            set-inp := LineEdit {
+                                text <=> root.shortcut-settings;
+                                height: 26px;
+                                accepted => {
+                                    root.shortcut-settings-changed(self.text);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 6. Startup with OS
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+                    cb := CheckBox {
+                        text: "Start Sticky Note automatically on Windows boot";
+                        checked: root.start-with-os;
+                        toggled => {
+                            root.start-with-os = self.checked;
+                            root.start-with-os-changed(self.checked);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

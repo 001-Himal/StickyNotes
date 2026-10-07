@@ -59,6 +59,7 @@ export component NoteWindow inherits Window {
     in-out property <bool> is-editing-title: false;
     in-out property <bool> show-color-palette: false;
     in-out property <bool> show-ask-dialog: false;
+    property <string> original-title: root.note-title;
 
     // Computed window title for OS display
     property <string> window-title: root.note-title != "" ? root.note-title : "Sticky Note";
@@ -72,6 +73,10 @@ export component NoteWindow inherits Window {
     callback ask-action-selected(string); // "delete", "close", "cancel"
     callback start-window-drag();
     callback start-window-resize();
+    callback window-drag-delta(length, length);
+    callback window-moved-completed();
+    callback window-resize-delta(length, length);
+    callback window-resize-completed();
     callback format-requested(string); // "bold", "italic", "underline", "bullet"
 
     // Main Note Paper Card Container
@@ -91,6 +96,13 @@ export component NoteWindow inherits Window {
             height: 100%;
 
             key-pressed(event) => {
+                if (root.is-editing-title) {
+                    if (event.text == Key.Escape) {
+                        root.note-title = root.original-title;
+                        root.is-editing-title = false;
+                        return accept;
+                    }
+                }
                 if (event.modifiers.control) {
                     if (event.text == "b" || event.text == "B") {
                         root.format-requested("bold");
@@ -128,14 +140,22 @@ export component NoteWindow inherits Window {
                 // Header hover detector & window drag handler
                 header-touch := TouchArea {
                     mouse-cursor: default;
+                    moved => {
+                        if (!root.is-editing-title && self.pressed) {
+                            root.window-drag-delta(self.mouse-x - self.pressed-x, self.mouse-y - self.pressed-y);
+                        }
+                    }
                     pointer-event(event) => {
                         if (event.kind == PointerEventKind.down && event.button == PointerEventButton.left) {
                             if (!root.is-editing-title) {
                                 root.start-window-drag();
                             }
+                        } else if (event.kind == PointerEventKind.up && event.button == PointerEventButton.left) {
+                            root.window-moved-completed();
                         }
                     }
                     double-clicked => {
+                        root.original-title = root.note-title;
                         root.is-editing-title = true;
                     }
                 }
@@ -162,13 +182,14 @@ export component NoteWindow inherits Window {
 
                     plus-touch := TouchArea {
                         mouse-cursor: pointer;
+                        enabled: header-touch.has-hover || self.has-hover;
                         clicked => {
                             root.add-note-clicked();
                         }
                     }
                 }
 
-                // Center Title
+                // Center Title (Non-editing view)
                 if !root.is-editing-title: Text {
                     x: 32px;
                     width: parent.width - 64px;
@@ -183,21 +204,42 @@ export component NoteWindow inherits Window {
                 }
 
                 // Inline Title Editor (Double-Click Activated)
-                if root.is-editing-title: title-input := TextInput {
+                if root.is-editing-title: title-container := Rectangle {
                     x: 32px;
                     width: parent.width - 64px;
                     height: 22px;
                     y: 3px;
-                    text: root.note-title;
-                    color: root.text-color;
-                    font-size: 12px;
-                    font-weight: 600;
-                    horizontal-alignment: center;
-                    vertical-alignment: center;
 
-                    accepted => {
-                        root.is-editing-title = false;
-                        root.title-changed(self.text);
+                    if root.note-title == "": Text {
+                        width: 100%;
+                        height: 100%;
+                        text: "Write title here...";
+                        color: root.text-color.transparentize(0.4);
+                        font-size: 12px;
+                        font-weight: 600;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+
+                    title-input := TextInput {
+                        width: 100%;
+                        height: 100%;
+                        text: root.note-title;
+                        color: root.text-color;
+                        font-size: 12px;
+                        font-weight: 600;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                        single-line: true;
+
+                        edited => {
+                            root.note-title = self.text;
+                        }
+
+                        accepted => {
+                            root.is-editing-title = false;
+                            root.title-changed(self.text);
+                        }
                     }
                 }
 
@@ -223,6 +265,7 @@ export component NoteWindow inherits Window {
 
                     close-touch := TouchArea {
                         mouse-cursor: pointer;
+                        enabled: header-touch.has-hover || self.has-hover;
                         clicked => {
                             root.close-note-clicked();
                         }
@@ -244,6 +287,10 @@ export component NoteWindow inherits Window {
                         } else if (event.kind == PointerEventKind.down && event.button == PointerEventButton.left) {
                             if (root.show-color-palette) {
                                 root.show-color-palette = false;
+                            }
+                            if (root.is-editing-title) {
+                                root.is-editing-title = false;
+                                root.title-changed(root.note-title);
                             }
                         }
                     }
@@ -322,9 +369,16 @@ export component NoteWindow inherits Window {
                 width: 100%;
                 height: 100%;
                 mouse-cursor: nwse-resize;
+                moved => {
+                    if (self.pressed) {
+                        root.window-resize-delta(self.mouse-x - self.pressed-x, self.mouse-y - self.pressed-y);
+                    }
+                }
                 pointer-event(event) => {
                     if (event.kind == PointerEventKind.down && event.button == PointerEventButton.left) {
                         root.start-window-resize();
+                    } else if (event.kind == PointerEventKind.up && event.button == PointerEventButton.left) {
+                        root.window-resize-completed();
                     }
                 }
             }
@@ -414,6 +468,13 @@ export component NoteWindow inherits Window {
             width: 100%;
             height: 100%;
             background: #00000030;
+
+            TouchArea {
+                clicked => {
+                    root.show-ask-dialog = false;
+                    root.ask-action-selected("cancel");
+                }
+            }
 
             ask-modal := Rectangle {
                 width: 220px;

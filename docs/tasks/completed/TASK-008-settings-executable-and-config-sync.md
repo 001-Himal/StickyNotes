@@ -1,13 +1,13 @@
 # TASK-008: Settings Executable and Sticky Note Themed Popup
 
-- **Status:** Queued
+- **Status:** Completed
 - **Priority:** Medium
 - **Owner:** Himal
-- **Target:** Milestone 3
+- **Target:** Milestone 2
 
 ## Description
 1. Create `crates/sticky-note-settings/` application.
-2. Build `ui/settings_window.slint` as a compact (380×320px) popup matching the warm pastel paper sticky note theme (`#FDF1B0` body, `#F6E077` header).
+2. Build `ui/settings_window.slint` as a compact (400×490px) popup matching the warm pastel paper sticky note theme (`#FDF1B0` body, `#F6E077` header).
 3. Configure settings options:
    - Close button action: Delete / Close / Ask each time.
    - Start with Windows toggle (Registry `Run` key on Windows).
@@ -20,7 +20,7 @@
 6. Terminate immediately upon close, releasing all memory.
 
 ## Acceptance Criteria
-- [ ] `Sticky Note Settings.exe` opens as a minimal, pastel sticky-note-styled popup.
-- [ ] Allows toggling Close action, Corner Style (Curled/Flat), and Startup.
-- [ ] Modifying settings notifies running `Sticky Note.exe` via IPC to reload configuration.
-- [ ] Closes cleanly with zero background residue.
+- [x] `Sticky Note Settings.exe` opens as a minimal, pastel sticky-note-styled popup.
+- [x] Allows toggling Close action, Corner Style (Curled/Flat), and Startup.
+- [x] Modifying settings notifies running `Sticky Note.exe` via IPC to reload configuration.
+- [x] Closes cleanly with zero background residue.

@@ -92,6 +92,41 @@ pub unsafe fn clamp_to_monitor_bounds(x: i32, y: i32, width: u32, height: u32) -
     }
 }
 
+/// Configures or removes Windows auto-start via HKCU\Software\Microsoft\Windows\CurrentVersion\Run.
+pub fn set_autostart_registry(enable: bool, exe_path: Option<&str>) -> std::io::Result<()> {
+    if enable {
+        let path = if let Some(p) = exe_path {
+            p.to_string()
+        } else {
+            std::env::current_exe()?.to_string_lossy().to_string()
+        };
+        let _ = std::process::Command::new("reg")
+            .args([
+                "add",
+                "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                "/v",
+                "StickyNote",
+                "/t",
+                "REG_SZ",
+                "/d",
+                &path,
+                "/f",
+            ])
+            .output()?;
+    } else {
+        let _ = std::process::Command::new("reg")
+            .args([
+                "delete",
+                "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                "/v",
+                "StickyNote",
+                "/f",
+            ])
+            .output()?;
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

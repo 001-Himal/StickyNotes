@@ -1,17 +1,30 @@
 # current.md
 
 ## Current Focus
-- Session: Implementation Kickoff (Milestone 1).
-- Status: TASK-001, TASK-002, TASK-003, and TASK-004 completed. Currently activating TASK-005: Window Dragging, Resizing and Dynamic Size Inheritance.
-- Active Task: `docs/tasks/queued/TASK-005-note-drag-resize-and-geometry.md`
+- Session: Polish & Packaging (Windows Release Ready).
+- Status: All core Windows milestones (M1 through M5) are completed. All 10 tasks implemented and verified with zero warnings and passing tests.
+- Active Task: None (All Windows release tasks completed).
 
 ## Completed
 - [x] TASK-001: Cargo Workspace Initialization (`sticky-note-core`, `sticky-note`, `sticky-note-settings`, Slint build integration).
 - [x] TASK-002: Core models, 6 authentic pastel palettes, atomic storage engine with reconciliation, and local single-instance IPC channel.
 - [x] TASK-003: Design and implement Slint Note Window UI (`ui/note_window.slint` with two-tone pastel cards, hover-only `+`/`X` controls, curled vs. flat corner, 6-color right-click palette, and keyboard formatting).
 - [x] TASK-004: Windows native desktop layer (`HWND_BOTTOM`), stealth windowing (`WS_EX_TOOLWINDOW` to omit from Taskbar & Alt+Tab), and multi-monitor bounds validation.
+- [x] TASK-005: Window Dragging, Resizing and Dynamic Size Inheritance (`last_used_width`/`height` in `config.json`).
+- [x] TASK-006: Header Controls, Quick Add cascade, sequential `Note 1/2` naming, double-click inline rename with placeholder & Escape cancellation, configurable close actions (delete, close, ask modal).
+- [x] TASK-007: Global Hotkey Integration (`Ctrl+Alt+N` creates note, `Ctrl+Alt+S` launches settings, idle CPU ~0.0%).
+- [x] TASK-008: Settings Executable UI (`ui/settings_window.slint`), config atomic persistence, and IPC `RELOAD_CONFIG` real-time sync.
+- [x] TASK-010: CI GitHub Actions Build and Windows Release Workflow (`.github/workflows/ci.yml`, `.github/workflows/release.yml`, release binaries built with LTO and stripping).
+
+## Blocked / Deferred
+- [ ] TASK-009: Cross-platform macOS and Linux windowing abstractions (Deferred to focus on Windows native release).
 
 ## Next Up
-- Execute TASK-005: Note drag, resize, and per-note geometry persistence with dynamic size inheritance.
-- Execute TASK-006: Header rename and hover controls lifecycle.
+- User manual verification and testing of standalone release binaries.
+
+
+
+
+
+
 

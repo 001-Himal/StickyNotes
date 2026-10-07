@@ -1,9 +1,10 @@
 # TASK-009: Cross-Platform macOS and Linux Windowing Abstractions
 
-- **Status:** Queued
+- **Status:** Blocked
 - **Priority:** Low
 - **Owner:** Himal
-- **Target:** Milestone 4
+- **Target:** Milestone 3
+- **Block Reason:** Deferred per user directive to focus exclusively on Windows native experience first. Cross-platform implementation will be revisited after Windows feature-complete release.
 
 ## Description
 1. Create `crates/sticky-note-core/src/platform/macos.rs` using Cocoa runtime:

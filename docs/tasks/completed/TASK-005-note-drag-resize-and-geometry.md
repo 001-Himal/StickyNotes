@@ -1,6 +1,6 @@
 # TASK-005: Window Dragging, Resizing and Dynamic Size Inheritance
 
-- **Status:** Queued
+- **Status:** Completed
 - **Priority:** High
 - **Owner:** Himal
 - **Target:** Milestone 2
@@ -13,8 +13,8 @@
 5. **Multi-Monitor Bounds Validation:** On startup and display changes, verify note bounding box intersects an active monitor's work area; clamp to primary monitor if a previously used secondary monitor was disconnected.
 
 ## Acceptance Criteria
-- [ ] Dragging header moves the window smoothly across monitors.
-- [ ] Resizing is single-direction (top-left anchored, right/down expanding) with min 180×120 clamp.
-- [ ] Position and size persist across process restarts.
-- [ ] Newly created notes default to the dimensions of the most recently resized note.
-- [ ] Notes do not get orphaned off-screen when monitors are disconnected.
+- [x] Dragging header moves the window smoothly across monitors.
+- [x] Resizing is single-direction (top-left anchored, right/down expanding) with min 180×120 clamp.
+- [x] Position and size persist across process restarts.
+- [x] Newly created notes default to the dimensions of the most recently resized note.
+- [x] Notes do not get orphaned off-screen when monitors are disconnected.

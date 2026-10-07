@@ -348,6 +348,29 @@ pub fn save_config(path: &Path, config: &Config) -> io::Result<()> {
     atomic_save_json(path, config)
 }
 
+/// Resolve a user-edited title: if empty or only whitespace, returns the fallback title.
+pub fn resolve_title(input: &str, fallback: &str) -> String {
+    let trimmed = input.trim();
+    if trimmed.is_empty() {
+        if fallback.trim().is_empty() {
+            "Note 1".to_string()
+        } else {
+            fallback.trim().to_string()
+        }
+    } else {
+        trimmed.to_string()
+    }
+}
+
+/// Updates the default note width and height in configuration for dynamic size inheritance.
+pub fn update_default_note_size(config_path: &Path, width: u32, height: u32) -> io::Result<Config> {
+    let mut config = load_config_or_default(config_path);
+    config.note_appearance.last_used_width = width.max(180);
+    config.note_appearance.last_used_height = height.max(120);
+    save_config(config_path, &config)?;
+    Ok(config)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -368,6 +391,15 @@ mod tests {
 
         let empty: Vec<&str> = vec![];
         assert_eq!(generate_next_title(&empty), "Note 1");
+    }
+
+    #[test]
+    fn test_resolve_title_placeholder_fallback() {
+        assert_eq!(resolve_title("   ", "Note 1"), "Note 1");
+        assert_eq!(resolve_title("", "Note 3"), "Note 3");
+        assert_eq!(resolve_title("  \t\n  ", "Note 2"), "Note 2");
+        assert_eq!(resolve_title("My Custom Title", "Note 1"), "My Custom Title");
+        assert_eq!(resolve_title("  Trimmed Title  ", "Note 1"), "Trimmed Title");
     }
 
     #[test]
@@ -417,9 +449,32 @@ mod tests {
         assert_eq!(rebuilt_notes.len(), 1);
         assert_eq!(rebuilt_notes[0].title, "Weekend Shopping");
 
-        // 5. Delete note
+        // 5. Test set_note_closed (CloseAction::Close)
+        storage.set_note_closed("note-1", true, &mut doc).expect("Close note");
+        let (_, closed_notes) = storage.load_all().expect("Load closed note");
+        assert_eq!(closed_notes.len(), 1);
+        assert!(closed_notes[0].is_closed);
+        assert!(doc.notes[0].is_closed);
+
+        // 6. Delete note (CloseAction::Delete)
         storage.delete_note("note-1", &mut doc).expect("Delete note");
         assert!(!storage.note_path("Weekend Shopping.json").exists());
         assert_eq!(doc.notes.len(), 0);
     }
+
+    #[test]
+    fn test_dynamic_size_inheritance() {
+        let temp_dir = tempfile::tempdir().expect("Create temp dir");
+        let config_path = temp_dir.path().join("config.json");
+
+        let updated = update_default_note_size(&config_path, 450, 350).expect("Update size");
+        assert_eq!(updated.note_appearance.last_used_width, 450);
+        assert_eq!(updated.note_appearance.last_used_height, 350);
+
+        // Clamping to minimum 180x120
+        let clamped = update_default_note_size(&config_path, 50, 50).expect("Clamp size");
+        assert_eq!(clamped.note_appearance.last_used_width, 180);
+        assert_eq!(clamped.note_appearance.last_used_height, 120);
+    }
 }
+

@@ -1,6 +1,6 @@
 # TASK-006: Header Controls, Quick Add, Note 1/2 Titles & Close Actions
 
-- **Status:** Queued
+- **Status:** Completed
 - **Priority:** High
 - **Owner:** Himal
 - **Target:** Milestone 2
@@ -17,8 +17,8 @@
    - `ask`: Displays a small themed prompt dialog: *"Delete note or just close?"*
 
 ## Acceptance Criteria
-- [ ] New notes automatically named `Note 1`, `Note 2`, etc.
-- [ ] Double clicking header renames note; blank input retains placeholder or falls back to `Note N`.
-- [ ] Hovering header reveals `+` and `X`; hidden when not hovered.
-- [ ] Clicking `+` creates a new note adjacent to the active one.
-- [ ] Close button action obeys user setting (delete, close, or ask prompt).
+- [x] New notes automatically named `Note 1`, `Note 2`, etc.
+- [x] Double clicking header renames note; blank input retains placeholder or falls back to `Note N`.
+- [x] Hovering header reveals `+` and `X`; hidden when not hovered.
+- [x] Clicking `+` creates a new note adjacent to the active one.
+- [x] Close button action obeys user setting (delete, close, or ask prompt).

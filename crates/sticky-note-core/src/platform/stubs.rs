@@ -10,3 +10,9 @@ pub fn apply_stealth_window_styles<T>(_handle: T) {}
 pub fn clamp_to_monitor_bounds(x: i32, y: i32, _width: u32, _height: u32) -> (i32, i32) {
     (x, y)
 }
+
+/// Sets autostart registry entry (stub).
+pub fn set_autostart_registry(_enable: bool, _exe_path: Option<&str>) -> std::io::Result<()> {
+    Ok(())
+}
+

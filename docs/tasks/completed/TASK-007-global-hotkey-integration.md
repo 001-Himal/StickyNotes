@@ -1,6 +1,6 @@
 # TASK-007: Global Hotkey Integration
 
-- **Status:** Queued
+- **Status:** Completed
 - **Priority:** Medium
 - **Owner:** Himal
 - **Target:** Milestone 2
@@ -12,6 +12,6 @@
 4. Run event listener without causing CPU wake-ups when idle.
 
 ## Acceptance Criteria
-- [ ] Pressing `Ctrl+Alt+N` creates a new note while another application has focus.
-- [ ] Pressing `Ctrl+Alt+S` launches settings.
-- [ ] Idle CPU remains ~0.0%.
+- [x] Pressing `Ctrl+Alt+N` creates a new note while another application has focus.
+- [x] Pressing `Ctrl+Alt+S` launches settings.
+- [x] Idle CPU remains ~0.0%.
