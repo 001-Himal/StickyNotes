@@ -1,6 +1,6 @@
 # TASK-001: Setup Cargo Workspace Structure
 
-- **Status:** Queued
+- **Status:** Completed
 - **Priority:** High
 - **Owner:** Himal
 - **Target:** Milestone 1
@@ -12,6 +12,6 @@ Initialize the root `Cargo.toml` workspace and crate subdirectories:
 - `crates/sticky-note-settings/` (Binary)
 
 ## Acceptance Criteria
-- [ ] Root `Cargo.toml` configured with workspace members.
-- [ ] `cargo check` compiles successfully across all three crates.
-- [ ] Slint build dependency wired into build scripts.
+- [x] Root `Cargo.toml` configured with workspace members.
+- [x] `cargo check` compiles successfully across all three crates.
+- [x] Slint build dependency wired into build scripts.

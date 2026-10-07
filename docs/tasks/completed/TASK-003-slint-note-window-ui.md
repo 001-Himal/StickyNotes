@@ -1,6 +1,6 @@
 # TASK-003: Design and Implement Slint Note Window UI
 
-- **Status:** Queued
+- **Status:** Completed
 - **Priority:** High
 - **Owner:** Himal
 - **Target:** Milestone 1
@@ -13,9 +13,9 @@ Develop `ui/note_window.slint` with the physical sticky note design system:
 4. Multi-line plain text editing area with smooth word wrapping, right-click 6-color palette context menu, and keyboard formatting (`Ctrl+B`, `Ctrl+I`, `Ctrl+U`, `Ctrl+L`).
 
 ## Acceptance Criteria
-- [ ] Slint UI renders cleanly with authentic two-tone pastel paper aesthetic.
-- [ ] Header hover reveals both `+` (quick-add) and `X` (close); invisible when not hovered.
-- [ ] Bottom-right corner switches between Curled and Flat appearance based on config.
-- [ ] Bottom-right resize grip is visible only on corner hover.
-- [ ] Right-click displays 6 pastel color swatches matching design system.
-- [ ] Keyboard shortcuts format plain text without visual ribbons.
+- [x] Slint UI renders cleanly with authentic two-tone pastel paper aesthetic.
+- [x] Header hover reveals both `+` (quick-add) and `X` (close); invisible when not hovered.
+- [x] Bottom-right corner switches between Curled and Flat appearance based on config.
+- [x] Bottom-right resize grip is visible only on corner hover.
+- [x] Right-click displays 6 pastel color swatches matching design system.
+- [x] Keyboard shortcuts format plain text without visual ribbons.

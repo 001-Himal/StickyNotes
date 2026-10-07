@@ -1,0 +1,15 @@
+[package]
+name = "sticky-note-settings"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+sticky-note-core.workspace = true
+slint.workspace = true
+interprocess.workspace = true
+
+[build-dependencies]
+slint-build.workspace = true

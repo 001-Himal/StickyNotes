@@ -1,0 +1,519 @@
+// Copyright (c) 2026 Sticky Note Contributors
+// SPDX-License-Identifier: MIT
+
+import { TextEdit } from "std-widgets.slint";
+
+/// Color swatch component for the 6-color right-click palette menu
+component ColorSwatch inherits Rectangle {
+    in property <color> swatch-color;
+    in property <string> color-name;
+    in property <bool> is-selected: false;
+    callback selected(string);
+
+    width: touch.has-hover ? 26px : 22px;
+    height: touch.has-hover ? 26px : 22px;
+    border-radius: self.width / 2;
+    background: root.swatch-color;
+    border-width: root.is-selected ? 2px : (touch.has-hover ? 2px : 1px);
+    border-color: root.is-selected || touch.has-hover ? #2B2B2B : #00000025;
+    drop-shadow-blur: touch.has-hover ? 4px : 2px;
+    drop-shadow-color: #00000020;
+
+    animate width, height { duration: 100ms; easing: ease-out; }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => {
+            root.selected(root.color-name);
+        }
+    }
+}
+
+/// Sticky Note Window
+export component NoteWindow inherits Window {
+    title: root.window-title;
+    preferred-width: 300px;
+    preferred-height: 220px;
+    min-width: 180px;
+    min-height: 120px;
+    no-frame: true;
+    background: transparent;
+    default-font-family: root.font-family;
+
+    // Note Data Properties
+    in-out property <string> note-id: "";
+    in-out property <string> note-title: "Note 1";
+    in-out property <string> note-content: "";
+    in-out property <string> color-theme: "yellow";
+    in-out property <string> corner-style: "curled"; // "curled" or "flat"
+    in-out property <string> font-family: "Segoe UI";
+    in-out property <length> font-size: 14px;
+
+    // Two-Tone Palette Colors
+    in-out property <color> header-bg: #F6E077;
+    in-out property <color> body-bg: #FDF1B0;
+    in-out property <color> text-color: #2B2B2B;
+    in-out property <color> accent-color: #E2CA58;
+
+    // UI State
+    in-out property <bool> is-editing-title: false;
+    in-out property <bool> show-color-palette: false;
+    in-out property <bool> show-ask-dialog: false;
+
+    // Computed window title for OS display
+    property <string> window-title: root.note-title != "" ? root.note-title : "Sticky Note";
+
+    // Callbacks to Rust
+    callback add-note-clicked();
+    callback close-note-clicked();
+    callback content-changed(string);
+    callback title-changed(string);
+    callback color-selected(string);
+    callback ask-action-selected(string); // "delete", "close", "cancel"
+    callback start-window-drag();
+    callback start-window-resize();
+    callback format-requested(string); // "bold", "italic", "underline", "bullet"
+
+    // Main Note Paper Card Container
+    main-card := Rectangle {
+        width: 100%;
+        height: 100%;
+        background: root.body-bg;
+        border-radius: 4px;
+        clip: true;
+
+        // Subtle ambient elevation border & shadow
+        border-width: 1px;
+        border-color: #00000018;
+
+        focus-scope := FocusScope {
+            width: 100%;
+            height: 100%;
+
+            key-pressed(event) => {
+                if (event.modifiers.control) {
+                    if (event.text == "b" || event.text == "B") {
+                        root.format-requested("bold");
+                        return accept;
+                    }
+                    if (event.text == "i" || event.text == "I") {
+                        root.format-requested("italic");
+                        return accept;
+                    }
+                    if (event.text == "u" || event.text == "U") {
+                        root.format-requested("underline");
+                        return accept;
+                    }
+                    if (event.text == "l" || event.text == "L") {
+                        root.format-requested("bullet");
+                        return accept;
+                    }
+                }
+                return reject;
+            }
+
+            VerticalLayout {
+                padding: 0px;
+                spacing: 0px;
+
+            // ==========================================
+            // HEADER BAR (28px fixed)
+            // ==========================================
+            header-bar := Rectangle {
+                height: 28px;
+                background: root.header-bg;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+
+                // Header hover detector & window drag handler
+                header-touch := TouchArea {
+                    mouse-cursor: default;
+                    pointer-event(event) => {
+                        if (event.kind == PointerEventKind.down && event.button == PointerEventButton.left) {
+                            if (!root.is-editing-title) {
+                                root.start-window-drag();
+                            }
+                        }
+                    }
+                    double-clicked => {
+                        root.is-editing-title = true;
+                    }
+                }
+
+                // Top-Left '+' Button (Quick-Add)
+                plus-btn := Rectangle {
+                    x: 6px;
+                    y: 4px;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 3px;
+                    background: plus-touch.has-hover ? #00000015 : transparent;
+                    opacity: header-touch.has-hover || plus-touch.has-hover ? 1.0 : 0.0;
+                    animate opacity { duration: 120ms; easing: ease-in-out; }
+
+                    Text {
+                        text: "+";
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: root.text-color;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+
+                    plus-touch := TouchArea {
+                        mouse-cursor: pointer;
+                        clicked => {
+                            root.add-note-clicked();
+                        }
+                    }
+                }
+
+                // Center Title
+                if !root.is-editing-title: Text {
+                    x: 32px;
+                    width: parent.width - 64px;
+                    height: 100%;
+                    text: root.note-title != "" ? root.note-title : "Write title here...";
+                    color: root.note-title != "" ? root.text-color : root.text-color.transparentize(0.4);
+                    font-size: 12px;
+                    font-weight: 600;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+
+                // Inline Title Editor (Double-Click Activated)
+                if root.is-editing-title: title-input := TextInput {
+                    x: 32px;
+                    width: parent.width - 64px;
+                    height: 22px;
+                    y: 3px;
+                    text: root.note-title;
+                    color: root.text-color;
+                    font-size: 12px;
+                    font-weight: 600;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+
+                    accepted => {
+                        root.is-editing-title = false;
+                        root.title-changed(self.text);
+                    }
+                }
+
+                // Top-Right 'X' Button (Close/Delete)
+                close-btn := Rectangle {
+                    x: parent.width - 26px;
+                    y: 4px;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 3px;
+                    background: close-touch.has-hover ? #E8112330 : transparent;
+                    opacity: header-touch.has-hover || close-touch.has-hover ? 1.0 : 0.0;
+                    animate opacity { duration: 120ms; easing: ease-in-out; }
+
+                    Text {
+                        text: "✕";
+                        font-size: 11px;
+                        font-weight: 600;
+                        color: close-touch.has-hover ? #E81123 : root.text-color;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+
+                    close-touch := TouchArea {
+                        mouse-cursor: pointer;
+                        clicked => {
+                            root.close-note-clicked();
+                        }
+                    }
+                }
+            }
+
+            // ==========================================
+            // TEXT CONTENT CANVAS
+            // ==========================================
+            body-container := Rectangle {
+                background: transparent;
+
+                // Right-click trigger for 6-color palette
+                content-touch := TouchArea {
+                    pointer-event(event) => {
+                        if (event.kind == PointerEventKind.down && event.button == PointerEventButton.right) {
+                            root.show-color-palette = !root.show-color-palette;
+                        } else if (event.kind == PointerEventKind.down && event.button == PointerEventButton.left) {
+                            if (root.show-color-palette) {
+                                root.show-color-palette = false;
+                            }
+                        }
+                    }
+                }
+
+                editor := TextEdit {
+                    x: 8px;
+                    y: 6px;
+                    width: parent.width - 16px;
+                    height: parent.height - 12px;
+                    text <=> root.note-content;
+                    font-size: root.font-size;
+                    edited => {
+                        root.content-changed(self.text);
+                    }
+                }
+            }
+        }
+    }
+
+        // ==========================================
+        // BOTTOM-RIGHT CORNER (22x22px)
+        // ==========================================
+        corner-container := Rectangle {
+            x: parent.width - 24px;
+            y: parent.height - 24px;
+            width: 24px;
+            height: 24px;
+
+            // Curled / Bended Corner Mode (Classic Win7 / 3M Post-It)
+            if root.corner-style == "curled": Rectangle {
+                width: 100%;
+                height: 100%;
+
+                // Under-curl shadow
+                Path {
+                    x: -1px;
+                    y: 1px;
+                    width: 22px;
+                    height: 22px;
+                    commands: "M 0 22 L 22 0 L 22 22 Z";
+                    fill: #00000028;
+                }
+
+                // Turned-over paper flap
+                Path {
+                    width: 22px;
+                    height: 22px;
+                    commands: "M 0 22 L 22 0 L 22 22 Z";
+                    fill: root.header-bg.brighter(0.15);
+                    stroke: root.accent-color;
+                    stroke-width: 0.5px;
+                }
+            }
+
+            // Normal / Flat Corner Mode (Modern Minimalist with Hover Grip Lines)
+            if root.corner-style == "flat": Rectangle {
+                width: 100%;
+                height: 100%;
+                opacity: corner-touch.has-hover ? 1.0 : 0.0;
+                animate opacity { duration: 120ms; easing: ease-in-out; }
+
+                Path {
+                    width: 16px;
+                    height: 16px;
+                    x: 6px;
+                    y: 6px;
+                    commands: "M 12 16 L 16 12 M 7 16 L 16 7 M 2 16 L 16 2";
+                    stroke: #A8A38B;
+                    stroke-width: 1.5px;
+                }
+            }
+
+            // Interactive Resize Grip Touch Area
+            corner-touch := TouchArea {
+                width: 100%;
+                height: 100%;
+                mouse-cursor: nwse-resize;
+                pointer-event(event) => {
+                    if (event.kind == PointerEventKind.down && event.button == PointerEventButton.left) {
+                        root.start-window-resize();
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // RIGHT-CLICK 6-COLOR PASTEL PALETTE POPUP
+        // ==========================================
+        if root.show-color-palette: palette-card := Rectangle {
+            x: 20px;
+            y: 34px;
+            width: 180px;
+            height: 44px;
+            border-radius: 6px;
+            background: #FFFFFFEE;
+            border-width: 1px;
+            border-color: #00000025;
+            drop-shadow-blur: 8px;
+            drop-shadow-color: #00000030;
+
+            HorizontalLayout {
+                padding: 6px;
+                spacing: 6px;
+                alignment: center;
+
+                ColorSwatch {
+                    swatch-color: #FDF1B0;
+                    color-name: "yellow";
+                    is-selected: root.color-theme == "yellow";
+                    selected(name) => {
+                        root.color-selected(name);
+                        root.show-color-palette = false;
+                    }
+                }
+                ColorSwatch {
+                    swatch-color: #C2E6F8;
+                    color-name: "blue";
+                    is-selected: root.color-theme == "blue";
+                    selected(name) => {
+                        root.color-selected(name);
+                        root.show-color-palette = false;
+                    }
+                }
+                ColorSwatch {
+                    swatch-color: #D8F6C8;
+                    color-name: "green";
+                    is-selected: root.color-theme == "green";
+                    selected(name) => {
+                        root.color-selected(name);
+                        root.show-color-palette = false;
+                    }
+                }
+                ColorSwatch {
+                    swatch-color: #FCD7E7;
+                    color-name: "pink";
+                    is-selected: root.color-theme == "pink";
+                    selected(name) => {
+                        root.color-selected(name);
+                        root.show-color-palette = false;
+                    }
+                }
+                ColorSwatch {
+                    swatch-color: #EAD8FA;
+                    color-name: "purple";
+                    is-selected: root.color-theme == "purple";
+                    selected(name) => {
+                        root.color-selected(name);
+                        root.show-color-palette = false;
+                    }
+                }
+                ColorSwatch {
+                    swatch-color: #FFFFFF;
+                    color-name: "white";
+                    is-selected: root.color-theme == "white";
+                    selected(name) => {
+                        root.color-selected(name);
+                        root.show-color-palette = false;
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // "DELETE OR JUST CLOSE?" CONFIRMATION MODAL
+        // ==========================================
+        if root.show-ask-dialog: ask-overlay := Rectangle {
+            width: 100%;
+            height: 100%;
+            background: #00000030;
+
+            ask-modal := Rectangle {
+                width: 220px;
+                height: 90px;
+                x: (parent.width - 220px) / 2;
+                y: (parent.height - 90px) / 2;
+                background: root.body-bg;
+                border-radius: 6px;
+                border-width: 1px;
+                border-color: #00000030;
+                drop-shadow-blur: 10px;
+                drop-shadow-color: #00000040;
+
+                VerticalLayout {
+                    padding: 8px;
+                    spacing: 8px;
+                    alignment: center;
+
+                    Text {
+                        text: "Delete note or just close?";
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: root.text-color;
+                        horizontal-alignment: center;
+                    }
+
+                    HorizontalLayout {
+                        spacing: 6px;
+                        alignment: center;
+
+                        Rectangle {
+                            width: 60px;
+                            height: 24px;
+                            border-radius: 4px;
+                            background: del-touch.has-hover ? #E81123 : #E8112325;
+
+                            Text {
+                                text: "Delete";
+                                font-size: 11px;
+                                font-weight: 600;
+                                color: del-touch.has-hover ? #FFFFFF : #E81123;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                            del-touch := TouchArea {
+                                mouse-cursor: pointer;
+                                clicked => {
+                                    root.show-ask-dialog = false;
+                                    root.ask-action-selected("delete");
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            width: 60px;
+                            height: 24px;
+                            border-radius: 4px;
+                            background: cls-touch.has-hover ? root.header-bg.darker(0.1) : root.header-bg;
+
+                            Text {
+                                text: "Close";
+                                font-size: 11px;
+                                font-weight: 600;
+                                color: root.text-color;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                            cls-touch := TouchArea {
+                                mouse-cursor: pointer;
+                                clicked => {
+                                    root.show-ask-dialog = false;
+                                    root.ask-action-selected("close");
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            width: 60px;
+                            height: 24px;
+                            border-radius: 4px;
+                            background: can-touch.has-hover ? #00000020 : #00000010;
+
+                            Text {
+                                text: "Cancel";
+                                font-size: 11px;
+                                color: root.text-color;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                            can-touch := TouchArea {
+                                mouse-cursor: pointer;
+                                clicked => {
+                                    root.show-ask-dialog = false;
+                                    root.ask-action-selected("cancel");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

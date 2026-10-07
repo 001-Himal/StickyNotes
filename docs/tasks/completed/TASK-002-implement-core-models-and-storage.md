@@ -1,6 +1,6 @@
 # TASK-002: Implement Core Models, Per-Note Storage & File Launching
 
-- **Status:** Queued
+- **Status:** Completed
 - **Priority:** High
 - **Owner:** Himal
 - **Target:** Milestone 1
@@ -19,7 +19,7 @@ In `crates/sticky-note-core/`:
 8. Add unit tests for models, atomic writing, title sanitization, reconciliation, and IPC command parsing.
 
 ## Acceptance Criteria
-- [ ] Unit tests pass for reading, writing, atomic renaming, and corrupted file fallback.
-- [ ] Title generator produces `Note 1`, `Note 2`, `Note 3` sequentially and sanitizes file paths.
-- [ ] Individual note files are created and loadable via CLI path argument and IPC.
-- [ ] Secondary process cleanly hands off file path to primary instance and exits.
+- [x] Unit tests pass for reading, writing, atomic renaming, and corrupted file fallback.
+- [x] Title generator produces `Note 1`, `Note 2`, `Note 3` sequentially and sanitizes file paths.
+- [x] Individual note files are created and loadable via CLI path argument and IPC.
+- [x] Secondary process cleanly hands off file path to primary instance and exits.

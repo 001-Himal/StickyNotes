@@ -1,6 +1,6 @@
 # TASK-004: Windows Desktop Layer and Stealth Window Integration
 
-- **Status:** Queued
+- **Status:** Completed
 - **Priority:** High
 - **Owner:** Himal
 - **Target:** Milestone 1
@@ -17,7 +17,7 @@ In `crates/sticky-note-core/src/platform/windows.rs`:
 6. Verify that opening Chrome or File Explorer covers the note window.
 
 ## Acceptance Criteria
-- [ ] Note is visible on the Windows desktop.
-- [ ] Note is completely invisible in the Taskbar and Alt+Tab switcher.
-- [ ] Clicking allows typing; switching to another app sinks note quietly behind foreground windows.
-- [ ] Changing display resolution does not push notes off-screen.
+- [x] Note is visible on the Windows desktop.
+- [x] Note is completely invisible in the Taskbar and Alt+Tab switcher.
+- [x] Clicking allows typing; switching to another app sinks note quietly behind foreground windows.
+- [x] Changing display resolution does not push notes off-screen.

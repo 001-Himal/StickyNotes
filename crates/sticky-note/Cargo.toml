@@ -1,0 +1,23 @@
+[package]
+name = "sticky-note"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+sticky-note-core.workspace = true
+slint.workspace = true
+global-hotkey.workspace = true
+interprocess.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.52", features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_Graphics_Gdi",
+] }
+
+[build-dependencies]
+slint-build.workspace = true
