@@ -22,8 +22,8 @@ docs/
 ├── product/         # PRD, principles, anti-feature-creep, requirements, user-flows, design-system
 ├── planning/        # roadmap, milestones, current
 ├── specs/           # features (FEAT-001 to 005), components
-├── tasks/           # queued (TASK-001 to 010), active, blocked, completed
-├── decisions/       # ADR-001 to 004 + index
+├── tasks/           # queued, active, blocked (TASK-009), completed (TASK-001 to 011)
+├── decisions/       # ADR-001 to 006 + index
 ├── rules/           # core, coding, frontend, performance, security, testing, git
 ├── skills/          # planning, implementation, debugging, testing, refactoring, etc.
 └── checklists/      # feature, bug, release, security, production

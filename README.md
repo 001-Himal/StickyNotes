@@ -54,6 +54,50 @@ Sticky Note/
 
 ---
 
+## 📦 Installation & Portable Usage
+
+Sticky Note is a **portable, standalone native desktop utility** — no installer wizard, no background database, and no runtime dependencies.
+
+### Option 1: Using the Pre-Built Portable Folder
+1. Locate the standalone directory: [`dist/Sticky Note`](file:///d:/Projects/StickyNotes/dist/Sticky%20Note)
+2. Double-click `Sticky Note.exe`. A fresh sticky note (`Note 1`) will appear directly on your desktop wallpaper.
+3. *(Optional)* Move the `Sticky Note` folder wherever you prefer (e.g., `C:\Users\<User>\AppData\Local\Sticky Note` or `C:\Program Files\Sticky Note`).
+
+### Option 2: Building from Source
+```powershell
+# Clone the repository
+git clone https://github.com/001-Himal/StickyNotes.git
+cd StickyNotes
+
+# Build optimized release binaries with LTO
+cargo build --release
+```
+The output binaries are located in `target/release/sticky-note.exe` and `target/release/sticky-note-settings.exe`.
+
+### 🚀 Starting with Windows Boot
+- **Via Settings GUI (Recommended):** Press `Ctrl + Alt + S` to open Sticky Note Settings, check **"Start Sticky Note automatically on Windows boot"**, and close the window.
+- **Via Windows Startup folder:** Press `Win + R`, type `shell:startup`, and place a shortcut to `Sticky Note.exe` inside.
+
+---
+
+## ⌨️ Shortcut & Interaction Cheatsheet
+
+| Action | Shortcut / Trigger |
+|---|---|
+| **New Note** | Click `+` on any note header, or press `Ctrl + Alt + N` from anywhere in the OS |
+| **Open Settings** | Press `Ctrl + Alt + S` |
+| **Rename Note** | Double-click header text; press `Enter` to commit, `Esc` to cancel |
+| **Color Palette** | Right-click anywhere on the note canvas |
+| **Resize Note** | Drag the bottom-right corner curl / flat grip outward |
+| **Move Note** | Click and drag the top header bar |
+| **Bold Text** | Select text and press `Ctrl + B` |
+| **Italic Text** | Select text and press `Ctrl + I` |
+| **Underline Text** | Select text and press `Ctrl + U` |
+| **Bullet List** | Press `Ctrl + L` on any line |
+| **Close Note** | Hover over header and click `✕` (configurable: Ask prompt, Close, or Delete) |
+
+---
+
 ## 🛠️ Development
 
 ```bash
@@ -68,15 +112,17 @@ cargo run --bin sticky-note-settings
 
 # Run tests and linter
 cargo test
-cargo clippy -- -D warnings
+cargo clippy --all-targets -- -D warnings
 ```
 
 ---
 
 ## 📖 Specifications & Architecture
-All project specifications, PRD, component designs, and roadmap are maintained in [`docs/`](file:///d:/Projects/StickyNotes/docs):
+All project specifications, architectural decisions, and tracking are maintained in [`docs/`](file:///d:/Projects/StickyNotes/docs):
 - [PRD.md](file:///d:/Projects/StickyNotes/docs/product/PRD.md) — Product Requirements Document
 - [design-system.md](file:///d:/Projects/StickyNotes/docs/product/design-system.md) — 6 Pastel Palettes & Corner Curl Specs
-- [roadmap.md](file:///d:/Projects/StickyNotes/docs/planning/roadmap.md) — Implementation Milestones
-- [tasks/queued/](file:///d:/Projects/StickyNotes/docs/tasks/queued/) — Granular tasks from TASK-001 to TASK-010
+- [roadmap.md](file:///d:/Projects/StickyNotes/docs/planning/roadmap.md) — Implementation Milestones & Roadmap
+- [current.md](file:///d:/Projects/StickyNotes/docs/planning/current.md) — Current Active Focus & Tracking
+- [tasks/completed/](file:///d:/Projects/StickyNotes/docs/tasks/completed/) — Completed task documentation (TASK-001 through TASK-010)
+
 

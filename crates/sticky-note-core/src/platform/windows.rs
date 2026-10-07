@@ -2,14 +2,35 @@
 
 use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
-use windows_sys::Win32::Foundation::{HWND, POINT, RECT};
+use windows_sys::Win32::Foundation::{BOOL, HWND, LPARAM, POINT, RECT};
 use windows_sys::Win32::Graphics::Gdi::{
     GetMonitorInfoW, MonitorFromPoint, MONITORINFO, MONITOR_DEFAULTTONEAREST,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    FindWindowW, GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, GWL_EXSTYLE, HWND_BOTTOM,
-    SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, WS_EX_APPWINDOW, WS_EX_TOOLWINDOW,
+    EnumWindows, FindWindowW, GetWindowLongPtrW, GetWindowThreadProcessId, SetWindowLongPtrW,
+    SetWindowPos, GWL_EXSTYLE, HWND_BOTTOM, SWP_FRAMECHANGED, SWP_NOACTIVATE, SWP_NOMOVE,
+    SWP_NOSIZE, WS_EX_APPWINDOW, WS_EX_TOOLWINDOW,
 };
+
+unsafe extern "system" fn enum_process_windows_proc(hwnd: HWND, lparam: LPARAM) -> BOOL {
+    let hwnds = &mut *(lparam as *mut Vec<HWND>);
+    let mut pid = 0;
+    GetWindowThreadProcessId(hwnd, &mut pid);
+    if pid == std::process::id() {
+        hwnds.push(hwnd);
+    }
+    1
+}
+
+/// Enumerates all windows belonging to the current process.
+///
+/// # Safety
+/// Calls Win32 `EnumWindows` and `GetWindowThreadProcessId` FFI.
+pub unsafe fn find_process_windows() -> Vec<HWND> {
+    let mut hwnds: Vec<HWND> = Vec::new();
+    EnumWindows(Some(enum_process_windows_proc), &mut hwnds as *mut _ as LPARAM);
+    hwnds
+}
 
 /// Finds a window by its exact window title bar string.
 ///
@@ -29,14 +50,24 @@ pub unsafe fn find_window_by_title(title: &str) -> Option<HWND> {
 }
 
 /// Applies stealth window styles (`WS_EX_TOOLWINDOW` and strips `WS_EX_APPWINDOW`)
-/// to omit the note from the Windows Taskbar and Alt+Tab application switcher.
+/// and immediately sinks the window to `HWND_BOTTOM` with `SWP_FRAMECHANGED` to omit
+/// the note from the Windows Taskbar and Alt+Tab application switcher.
 ///
 /// # Safety
-/// Calls Win32 `GetWindowLongPtrW` and `SetWindowLongPtrW` FFI.
+/// Calls Win32 `GetWindowLongPtrW`, `SetWindowLongPtrW`, and `SetWindowPos` FFI.
 pub unsafe fn apply_stealth_window_styles(hwnd: HWND) {
     let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
     let new_ex_style = (ex_style | WS_EX_TOOLWINDOW as isize) & !(WS_EX_APPWINDOW as isize);
     SetWindowLongPtrW(hwnd, GWL_EXSTYLE, new_ex_style);
+    SetWindowPos(
+        hwnd,
+        HWND_BOTTOM,
+        0,
+        0,
+        0,
+        0,
+        SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+    );
 }
 
 /// Sinks a window directly to the desktop bottom layer (`HWND_BOTTOM`)
@@ -54,6 +85,19 @@ pub unsafe fn sink_to_desktop_layer(hwnd: HWND) {
         0,
         SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
     );
+}
+
+/// Finds all windows of the current process, applies stealth styles,
+/// and sinks them to the desktop layer.
+///
+/// # Safety
+/// Calls Win32 FFI functions.
+pub unsafe fn stealth_and_sink_all_process_windows() {
+    let hwnds = find_process_windows();
+    for hwnd in hwnds {
+        apply_stealth_window_styles(hwnd);
+        sink_to_desktop_layer(hwnd);
+    }
 }
 
 /// Validates and clamps `(x, y)` coordinates to ensure the note window

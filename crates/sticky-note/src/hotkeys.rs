@@ -8,7 +8,6 @@ use std::path::Path;
 use std::thread;
 
 pub struct HotkeyService {
-    _manager: GlobalHotKeyManager,
     #[allow(dead_code)]
     pub new_note_id: u32,
     #[allow(dead_code)]
@@ -113,14 +112,6 @@ impl HotkeyService {
         FNewNote: Fn() + Send + 'static,
         FSettings: Fn() + Send + 'static,
     {
-        let manager = match GlobalHotKeyManager::new() {
-            Ok(m) => m,
-            Err(e) => {
-                eprintln!("Warning: Failed to initialize GlobalHotKeyManager ({e})");
-                return None;
-            }
-        };
-
         let new_note_hotkey = parse_hotkey_str(new_note_shortcut).unwrap_or_else(|| {
             HotKey::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyN)
         });
@@ -131,14 +122,6 @@ impl HotkeyService {
 
         let new_note_id = new_note_hotkey.id();
         let settings_id = settings_hotkey.id();
-
-        if let Err(e) = manager.register(new_note_hotkey) {
-            eprintln!("Warning: Failed to register new note hotkey ({new_note_shortcut}): {e}");
-        }
-
-        if let Err(e) = manager.register(settings_hotkey) {
-            eprintln!("Warning: Failed to register settings hotkey ({settings_shortcut}): {e}");
-        }
 
         let receiver = GlobalHotKeyEvent::receiver();
 
@@ -154,8 +137,42 @@ impl HotkeyService {
             }
         });
 
+        let new_note_str = new_note_shortcut.to_string();
+        let settings_str = settings_shortcut.to_string();
+
+        thread::spawn(move || {
+            let manager = match GlobalHotKeyManager::new() {
+                Ok(m) => m,
+                Err(e) => {
+                    eprintln!("Warning: Failed to initialize GlobalHotKeyManager ({e})");
+                    return;
+                }
+            };
+
+            if let Err(e) = manager.register(new_note_hotkey) {
+                eprintln!("Warning: Failed to register new note hotkey ({new_note_str}): {e}");
+            }
+
+            if let Err(e) = manager.register(settings_hotkey) {
+                eprintln!("Warning: Failed to register settings hotkey ({settings_str}): {e}");
+            }
+
+            #[cfg(windows)]
+            unsafe {
+                let mut msg = std::mem::zeroed();
+                while windows_sys::Win32::UI::WindowsAndMessaging::GetMessageW(&mut msg, 0, 0, 0) > 0 {
+                    windows_sys::Win32::UI::WindowsAndMessaging::TranslateMessage(&msg);
+                    windows_sys::Win32::UI::WindowsAndMessaging::DispatchMessageW(&msg);
+                }
+            }
+
+            #[cfg(not(windows))]
+            loop {
+                thread::sleep(std::time::Duration::from_secs(3600));
+            }
+        });
+
         Some(Self {
-            _manager: manager,
             new_note_id,
             settings_id,
         })

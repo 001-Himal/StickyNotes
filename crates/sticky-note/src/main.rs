@@ -1,12 +1,10 @@
+#![windows_subsystem = "windows"]
 slint::include_modules!();
 
 mod hotkeys;
 
 #[cfg(windows)]
-use sticky_note_core::{
-    apply_stealth_window_styles, clamp_to_monitor_bounds, find_window_by_title,
-    sink_to_desktop_layer,
-};
+use sticky_note_core::{clamp_to_monitor_bounds, stealth_and_sink_all_process_windows};
 use sticky_note_core::{
     apply_text_formatting, current_timestamp, generate_next_title, load_config_or_default,
     load_json, resolve_title, send_ipc_command, update_default_note_size, CloseAction, Config,
@@ -384,6 +382,11 @@ fn create_and_show_note_window(
                                 .set_position(slint::PhysicalPosition::new(clamped_x, clamped_y));
                             session.note.x = clamped_x;
                             session.note.y = clamped_y;
+
+                            #[cfg(windows)]
+                            unsafe {
+                                stealth_and_sink_all_process_windows();
+                            }
                         }
                     }
                 });
@@ -451,11 +454,18 @@ fn create_and_show_note_window(
     #[cfg(windows)]
     {
         unsafe {
-            if let Some(hwnd) = find_window_by_title(&window.get_note_title()) {
-                apply_stealth_window_styles(hwnd);
-                sink_to_desktop_layer(hwnd);
-            }
+            stealth_and_sink_all_process_windows();
         }
+        slint::Timer::single_shot(std::time::Duration::from_millis(50), || {
+            unsafe {
+                stealth_and_sink_all_process_windows();
+            }
+        });
+        slint::Timer::single_shot(std::time::Duration::from_millis(150), || {
+            unsafe {
+                stealth_and_sink_all_process_windows();
+            }
+        });
     }
 
     app.sessions.insert(

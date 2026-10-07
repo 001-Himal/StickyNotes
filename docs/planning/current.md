@@ -15,12 +15,13 @@
 - [x] TASK-007: Global Hotkey Integration (`Ctrl+Alt+N` creates note, `Ctrl+Alt+S` launches settings, idle CPU ~0.0%).
 - [x] TASK-008: Settings Executable UI (`ui/settings_window.slint`), config atomic persistence, and IPC `RELOAD_CONFIG` real-time sync.
 - [x] TASK-010: CI GitHub Actions Build and Windows Release Workflow (`.github/workflows/ci.yml`, `.github/workflows/release.yml`, release binaries built with LTO and stripping).
+- [x] TASK-011: Windows Runtime UX & Rendering Bugfixes (suppressed console window via `#![windows_subsystem = "windows"]`, fixed Alt+Tab leaks & initial z-order via `EnumWindows` and `SWP_FRAMECHANGED`, resolved global hotkeys via dedicated message pump thread, fixed in-editor `Ctrl+B/I/U/L` shortcuts by handling ASCII control codes, replaced tofu close glyph with vector `Path` cross).
 
 ## Blocked / Deferred
 - [ ] TASK-009: Cross-platform macOS and Linux windowing abstractions (Deferred to focus on Windows native release).
 
 ## Next Up
-- User manual verification and testing of standalone release binaries.
+- Package updated binaries to `dist/Sticky Note/` and finalize release verification.
 
 
 

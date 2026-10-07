@@ -104,19 +104,19 @@ export component NoteWindow inherits Window {
                     }
                 }
                 if (event.modifiers.control) {
-                    if (event.text == "b" || event.text == "B") {
+                    if (event.text == "b" || event.text == "B" || event.text == "\u{0002}") {
                         root.format-requested("bold");
                         return accept;
                     }
-                    if (event.text == "i" || event.text == "I") {
+                    if (event.text == "i" || event.text == "I" || event.text == "\u{0009}") {
                         root.format-requested("italic");
                         return accept;
                     }
-                    if (event.text == "u" || event.text == "U") {
+                    if (event.text == "u" || event.text == "U" || event.text == "\u{0015}") {
                         root.format-requested("underline");
                         return accept;
                     }
-                    if (event.text == "l" || event.text == "L") {
+                    if (event.text == "l" || event.text == "L" || event.text == "\u{000c}") {
                         root.format-requested("bullet");
                         return accept;
                     }
@@ -254,13 +254,14 @@ export component NoteWindow inherits Window {
                     opacity: header-touch.has-hover || close-touch.has-hover ? 1.0 : 0.0;
                     animate opacity { duration: 120ms; easing: ease-in-out; }
 
-                    Text {
-                        text: "✕";
-                        font-size: 11px;
-                        font-weight: 600;
-                        color: close-touch.has-hover ? #E81123 : root.text-color;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
+                    Path {
+                        width: 8px;
+                        height: 8px;
+                        x: (parent.width - self.width) / 2;
+                        y: (parent.height - self.height) / 2;
+                        stroke: close-touch.has-hover ? #E81123 : root.text-color;
+                        stroke-width: 1.5px;
+                        commands: "M 0 0 L 8 8 M 8 0 L 0 8";
                     }
 
                     close-touch := TouchArea {

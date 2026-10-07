@@ -135,13 +135,14 @@ export component SettingsWindow inherits Window {
                     border-radius: 3px;
                     background: close-touch.has-hover ? #E81123 : transparent;
 
-                    Text {
-                        text: "✕";
-                        font-size: 11px;
-                        font-weight: 600;
-                        color: close-touch.has-hover ? #FFFFFF : #2B2B2B;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
+                    Path {
+                        width: 8px;
+                        height: 8px;
+                        x: (parent.width - self.width) / 2;
+                        y: (parent.height - self.height) / 2;
+                        stroke: close-touch.has-hover ? #FFFFFF : #2B2B2B;
+                        stroke-width: 1.5px;
+                        commands: "M 0 0 L 8 8 M 8 0 L 0 8";
                     }
 
                     close-touch := TouchArea {

@@ -32,9 +32,10 @@ Modern notes applications have become bloated "productivity ecosystems" with mul
   - Web views, Electron, Node.js runtimes.
 
 ## Success criteria
-- [ ] Process memory idle below 50 MB (preferably 10-30 MB).
-- [ ] Idle CPU usage ~0.0%.
-- [ ] Notes do not appear in Windows Taskbar, macOS Dock, or Alt+Tab/Cmd+Tab app switcher.
-- [ ] Notes stay on desktop layer beneath normal applications.
-- [ ] Changes auto-save reliably to local JSON with atomic writes (zero corruption).
-- [ ] Two clean separate binaries: `Sticky Note` and `Sticky Note Settings`.
+- [x] Process memory idle below 50 MB (preferably 10-30 MB).
+- [x] Idle CPU usage ~0.0%.
+- [x] Notes do not appear in Windows Taskbar, macOS Dock, or Alt+Tab/Cmd+Tab app switcher.
+- [x] Notes stay on desktop layer beneath normal applications.
+- [x] Changes auto-save reliably to local JSON with atomic writes (zero corruption).
+- [x] Two clean separate binaries: `Sticky Note` and `Sticky Note Settings`.
+
