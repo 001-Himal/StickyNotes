@@ -14,5 +14,5 @@
 - keep idle memory strictly under 50 MB (target: 15–30 MB)
 - keep idle CPU at 0.0%
 - verify: `cargo check`, `cargo clippy -- -D warnings`, `cargo test`
-- update tracking files in `.vibe/planning/` and `.vibe/tasks/`
+- update tracking files in `docs/planning/` and `docs/tasks/`
 - wrap unsafe platform FFI in safe, idiomatic Rust abstractions

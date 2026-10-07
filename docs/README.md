@@ -1,12 +1,12 @@
-# .vibe — The Control Center
+# docs — Project Architecture & Control Center
 
-Canonical source of truth for how AI agents work on this project + project tracking.
+Canonical source of truth for architecture, specifications, rules, and tracking.
 
 ## Read order
 
 1. `README.md` (Project README — read first)
 2. `AGENTS.md`
-3. `.vibe/README.md` (this file)
+3. `docs/README.md` (this file)
 4. `context/project.md` → `stack.md` → `architecture.md`
 5. `product/PRD.md`
 6. `config/protected.yaml` + `config/permissions.yaml`
@@ -16,7 +16,7 @@ Canonical source of truth for how AI agents work on this project + project track
 ## Map
 
 ```
-.vibe/
+docs/
 ├── config/          # project.yaml, commands.yaml, paths.yaml, permissions.yaml, protected.yaml
 ├── context/         # project, product, stack, architecture, structure, conventions, dependencies, health, glossary
 ├── product/         # PRD, principles, anti-feature-creep, requirements, user-flows, design-system

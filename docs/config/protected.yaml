@@ -3,6 +3,6 @@ protected:
   - "config.json"
   - "Sticky Note Notes/**"
   - ".github/workflows/**"
-  - ".vibe/rules/**"
+  - "docs/rules/**"
   - "AGENTS.md"
   - "LICENSE"

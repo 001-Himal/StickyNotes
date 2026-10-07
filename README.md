@@ -73,9 +73,10 @@ cargo clippy -- -D warnings
 
 ---
 
-## 📖 Specifications & Control Center
-All project specifications, PRD, component designs, and roadmap are maintained in [`.vibe/`](file:///d:/Projects/StickyNotes/.vibe):
-- [PRD.md](file:///d:/Projects/StickyNotes/.vibe/product/PRD.md) — Product Requirements Document
-- [design-system.md](file:///d:/Projects/StickyNotes/.vibe/product/design-system.md) — 6 Pastel Palettes & Corner Curl Specs
-- [roadmap.md](file:///d:/Projects/StickyNotes/.vibe/planning/roadmap.md) — Implementation Milestones
-- [tasks/queued/](file:///d:/Projects/StickyNotes/.vibe/tasks/queued/) — Granular tasks from TASK-001 to TASK-010
+## 📖 Specifications & Architecture
+All project specifications, PRD, component designs, and roadmap are maintained in [`docs/`](file:///d:/Projects/StickyNotes/docs):
+- [PRD.md](file:///d:/Projects/StickyNotes/docs/product/PRD.md) — Product Requirements Document
+- [design-system.md](file:///d:/Projects/StickyNotes/docs/product/design-system.md) — 6 Pastel Palettes & Corner Curl Specs
+- [roadmap.md](file:///d:/Projects/StickyNotes/docs/planning/roadmap.md) — Implementation Milestones
+- [tasks/queued/](file:///d:/Projects/StickyNotes/docs/tasks/queued/) — Granular tasks from TASK-001 to TASK-010
+
