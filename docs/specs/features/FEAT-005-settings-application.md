@@ -45,11 +45,15 @@ Provide a minimal, on-demand configuration executable (`Sticky Note Settings`) t
    - **Shortcuts**: Key combinations for New Note and Open Settings.
 4. **Dynamic Size Inheritance**:
    - Whenever any note is resized by the user, `last_used_width` and `last_used_height` in `config.json` update automatically. New notes instantiate using these dimensions. No static presets dropdown.
-5. **No Trash Recovery**:
+5. **Real-Time Config Synchronization via IPC**:
+   - On saving changes to `config.json`, `Sticky Note Settings` connects to the local IPC named pipe (`\\.\pipe\StickyNote_IPC`) and transmits `RELOAD_CONFIG`.
+   - Running `Sticky Note.exe` updates active notes and settings in-memory immediately without busy polling or requiring restart.
+6. **No Trash Recovery**:
    - Strictly minimalist; no trash or recovery database.
 
 ## Acceptance Criteria
 - [ ] Settings window displays with the warm pastel paper sticky note theme.
 - [ ] Close action options include: Delete, Close, and Ask prompt.
+- [ ] Saving settings notifies running `Sticky Note` process via IPC to reload configuration.
 - [ ] Resizing any note dynamically updates default dimensions for future notes.
 - [ ] Settings process exits cleanly with zero background residue.

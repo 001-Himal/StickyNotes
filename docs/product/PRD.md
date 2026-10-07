@@ -37,13 +37,15 @@ Sticky Note/
 ├── Sticky Note Settings.exe # Preferences & control center
 ├── config.json              # Shared preferences file
 └── Sticky Note Notes/       # Local notes storage
-    ├── Notes.json           # Primary metadata index
-    └── note-*.json          # Optional individual note backups
+    ├── Notes.json           # Primary metadata index & cache
+    ├── Note 1.json          # Individual note document (double-clickable!)
+    ├── Note 2.json          # Self-contained note document
+    └── ...
 ```
 
 ### Component Roles
-- **`Sticky Note` (Main Widget Process):** Runs continuously in the background (or system tray). Manages note windows on the desktop layer, handles mouse drag/resize events, auto-saves text, and registers system-wide global shortcuts.
-- **`Sticky Note Settings` (Control Center Process):** An independent utility launched on-demand via global shortcut (`Ctrl+Alt+S`) or Start Menu. Reads and modifies `config.json`, notifies the main process, and exits when closed.
+- **`Sticky Note` (Main Widget Process):** Runs continuously in the background. Manages note windows on the desktop layer, handles mouse drag/resize events, auto-saves text, enforces single-instance IPC, and registers system-wide global shortcuts.
+- **`Sticky Note Settings` (Control Center Process):** An independent utility launched on-demand via global shortcut (`Ctrl+Alt+S`) or Start Menu. Reads and modifies `config.json`, notifies the main process via local IPC (`RELOAD_CONFIG`), and exits immediately when closed.
 
 ---
 
@@ -53,13 +55,13 @@ Sticky Note/
 
 | Feature | Specification |
 |---|---|
-| **Layering** | Resides on the desktop level (`HWND_BOTTOM` / Progman worker layer on Windows, `kCGDesktopWindowLevel` on macOS, Desktop type on Linux). Never floats above active applications. |
+| **Layering** | Resides on the desktop level. On Windows: `WS_EX_TOOLWINDOW` and sinks to `HWND_BOTTOM` on blur/deactivate; allows typing focus when clicked. On macOS: `NSWindow.level` above desktop icons with accessory policy. On Linux: `_NET_WM_STATE_BELOW` utility. Never permanently covers normal applications; visible when returning to desktop. |
 | **Window Chrome** | Frameless/borderless window with subtle soft shadow. No OS caption bar. |
 | **Taskbar / Switcher** | Excluded from Windows Taskbar, macOS Dock, and Alt+Tab / Cmd+Tab app switchers (`WS_EX_TOOLWINDOW`). |
-| **Movement** | Dragging from anywhere on the header moves the window smoothly across monitors. |
+| **Movement** | Dragging from anywhere on the header moves the window smoothly across monitors. Automatically bounds-checked against active displays on startup/resolution changes. |
 | **Resizing & Dynamic Inheritance** | Resizing is single-direction (outward horizontally to the right and vertically downward from bottom-right corner; top-left stays anchored). **Hover-Only Visibility:** The corner resize indicator is **100% invisible** until the cursor hovers directly over the bottom-right corner. Min size: 180×120. When resized, that `(width, height)` automatically becomes the default for all future notes. |
 | **Bottom-Right Corner Appearance** | Features an authentic **bended / curled paper corner** (dog-ear curl look with soft drop-shadow) simulating physical paper, or clean **flat** corner. Togglable in `Sticky Note Settings`. |
-| **Per-Note Geometry Persistence** | Each note saves its own exact `(x, y, width, height)` in `Notes.json` so every note reopens exactly as placed. |
+| **Per-Note Geometry Persistence** | Each note saves its own exact `(x, y, width, height)` in `Notes.json` and its individual note file so every note reopens exactly as placed. |
 
 ### 4.2. Header, Quick-Add & Title Behavior
 
@@ -88,11 +90,13 @@ Sticky Note/
   6. 🟨 **Yellow (Default):** Muted yellow header (`#F6E077`) with light yellow main body (`#FDF1B0`), with `+` top-left and `x` top-right
   *The chosen color is saved individually with that note in `Notes.json`.*
 - **Keyboard-Only Formatting (Zero Toolbars):**
-  - `Ctrl + B`: Bold text toggle
-  - `Ctrl + I`: Italic text toggle
-  - `Ctrl + U`: Underline text toggle
-  - `Ctrl + L`: Bullet list / alignment toggle
-- **Auto-Save:** Keystrokes are buffered and debounced (300ms) before committing atomically to `Notes.json`.
+  - Text is stored as lightweight plain UTF-8 text with zero bloated WYSIWYG overhead.
+  - Keyboard shortcuts provide instant text structuring without permanent visual ribbons:
+    - `Ctrl + B`: Bold formatting wrapper (`**text**`)
+    - `Ctrl + I`: Italic formatting wrapper (`*text*`)
+    - `Ctrl + U`: Underline formatting wrapper (`_text_`)
+    - `Ctrl + L`: Bullet list line prefix (`- `)
+- **Auto-Save:** Keystrokes are buffered and debounced (300ms) before committing atomically to both the individual note file and `Notes.json`.
 
 ### 4.4. Global Shortcuts
 
@@ -120,8 +124,9 @@ A minimal, small popup window designed with the **exact same pastel paper aesthe
 
 ### 4.6. Direct File Access & Explorer Double-Click Launch
 
-- **Individual Note Files in `Sticky Note Notes/`:** Each note is stored as an individual, accessible file (e.g. `Note 1.json`, `Note 2.json`, ...) alongside the index.
-- **Double-Click Launch in Background:** Double-clicking any note file in Windows File Explorer launches/signals `Sticky Note.exe` in the background to immediately open, restore, and display that note window on the desktop.
+- **Individual Note Files in `Sticky Note Notes/`:** Each note is stored as a self-contained, human-readable file (e.g. `Note 1.json`, `Note 2.json`, or `{Sanitized_Title}.json`) alongside the `Notes.json` index. When a note title is renamed, the file is renamed safely (sanitizing illegal OS filename characters).
+- **Double-Click Launch & Single-Instance IPC:** Double-clicking any note file in Windows File Explorer (or invoking `Sticky Note.exe "<path>"`) triggers the single-instance IPC client to send the note path to the running `Sticky Note.exe` background process via local named pipe. The running process immediately restores, unhides, and focuses that note on the desktop. If no process is running, `Sticky Note.exe` launches normally and displays that note.
+- **Authoritative Data & Resiliency:** Individual note files contain complete note state. If `Notes.json` is lost or deleted, `Sticky Note` automatically reconstructs it by scanning `Sticky Note Notes/*.json`. If a note file was edited manually outside the app (newer modification timestamp), its changes take precedence on load.
 - **Solves File Accessibility:** Users can browse, open, copy, or organize their notes directly from their native OS file manager without needing an in-app file browser.
 
 ---

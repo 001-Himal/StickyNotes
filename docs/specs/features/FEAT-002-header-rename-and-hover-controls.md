@@ -23,7 +23,11 @@ Implement authentic physical sticky note micro-interactions: hover disclosure of
    - Right-clicking note canvas displays 6 classic pastel swatches (Yellow, Green, Blue, Purple, Pink, White).
    - Selected color updates the note theme immediately and persists in `Notes.json`.
 6. **Keyboard-Only Formatting**:
-   - Standard shortcuts without toolbars: `Ctrl+B` (Bold), `Ctrl+I` (Italic), `Ctrl+U` (Underline), `Ctrl+L` (Bullet list / alignment).
+   - Zero visual toolbars. Operates directly on plain UTF-8 text:
+     - `Ctrl+B`: Wrap selection in bold markers (`**`)
+     - `Ctrl+I`: Wrap selection in italic markers (`*`)
+     - `Ctrl+U`: Wrap selection in underline markers (`_`)
+     - `Ctrl+L`: Prepend bullet list prefix (`- `) to the current line
 
 ## Acceptance Criteria
 - [ ] Hovering header reveals both `+` (top-left) and `X` (top-right).

@@ -39,9 +39,15 @@ StickyNotes/
 │           └── main.rs
 ├── tests/                         # Integration & persistence tests
 │   └── storage_tests.rs
-└── docs/                          # Architecture & user guides
-    ├── architecture/
-    ├── development/
-    ├── product/
-    └── guides/
+└── docs/                          # Canonical project documentation
+    ├── checklists/                # Release & quality checklists
+    ├── config/                    # Machine configs & path maps
+    ├── context/                   # Architecture, stack & dependencies
+    ├── decisions/                 # Architecture Decision Records (ADRs)
+    ├── planning/                  # Roadmap, milestones, current status
+    ├── product/                   # PRD, design system, user flows
+    ├── rules/                     # Non-negotiable engineering rules
+    ├── skills/                    # Operational workflow guides
+    ├── specs/                     # Feature & component specifications
+    └── tasks/                     # Granular task tracking (queued/active)
 ```

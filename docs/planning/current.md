@@ -1,10 +1,9 @@
 # current.md
 
 ## Current Focus
-- Session: Initial Planning, blueprint pruning, and architecture specification.
-- Status: Blueprint fully tailored and pruned. PRD, schemas, specifications, and tasks established. Ready for implementation kickoff whenever scheduled.
+- Session: Final Pre-Implementation Review & Architecture Solidification.
+- Status: Pre-implementation review complete. Contradictions resolved across PRD, specs, design system, and tasks. ADR-005 (Single-Instance IPC & File Launching) documented. Dual storage and platform layer lifecycles defined. Ready for implementation kickoff.
 
 ## Next Up
-- Initialize Cargo workspace (`Cargo.toml`).
-- Create `crates/sticky-note-core/` with `Note` and `Config` models.
-- Create `crates/sticky-note/` with basic Slint `NoteWindow`.
+- Execute TASK-001: Initialize Cargo workspace (`Cargo.toml`) with `sticky-note-core`, `sticky-note`, and `sticky-note-settings`.
+- Execute TASK-002: Core models, storage engine, and single-instance IPC channel.

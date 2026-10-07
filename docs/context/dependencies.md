@@ -10,3 +10,4 @@
 | `windows-sys` (Windows) | 0.52+ | Win32 API calls (`HWND_BOTTOM`, `WS_EX_TOOLWINDOW`, Progman) | Zero-cost FFI bindings |
 | `tray-icon` | 0.17+ | System tray icon for preferences and quick new note | Native OS tray hook |
 | `tempfile` | 3.10+ | Temporary files for atomic disk writes | Safety against partial write crashes |
+| `interprocess` | 2.2+ | Lightweight local named pipes / domain sockets for single-instance & IPC | Zero-network, local OS IPC only, ~0% idle CPU |

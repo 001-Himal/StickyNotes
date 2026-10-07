@@ -5,8 +5,8 @@ The preferences dialog rendered by `Sticky Note Settings.exe`.
 
 ## Visual Design: Sticky Note Paper Aesthetic
 Rather than appearing as a harsh grey system dialog, the Settings window is styled as a minimal, compact sticky note card:
-- Background: Warm pastel paper tone (`#FFF8D6`).
-- Header: Subtle pastel bar (`#F5E8A9`) with title "Sticky Note Settings" and top-right 'X'.
+- Background: Warm pastel paper tone (`#FDF1B0`).
+- Header: Subtle pastel bar (`#F6E077`) with title "Sticky Note Settings" and top-right 'X'.
 - Dimensions: Compact fixed popup (380 × 320 px).
 - Border: Soft rounded corners (6px), subtle ambient shadow.
 

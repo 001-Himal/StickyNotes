@@ -13,30 +13,38 @@ Sticky Note/
 ├── config.json              (Shared configuration)
 └── Sticky Note Notes/       (Local notes storage)
     ├── Notes.json           (Primary registry & metadata index)
-    ├── note-001.json        (Individual note content & history)
+    ├── Note 1.json          (Individual self-contained note document)
+    ├── Note 2.json          (Double-clickable in File Explorer)
     └── ...
 ```
 
 ## Components
 - **Window Management Subsystem (`platform/`)**:
-  - Implements OS-specific window layering:
-    - Windows: Hooks behind desktop top-level windows (`HWND_BOTTOM` / Progman worker) with `WS_EX_TOOLWINDOW` to eliminate taskbar and Alt+Tab presence.
-    - macOS: Sets `NSWindow.Level = kCGDesktopWindowLevel` and `NSApplicationActivationPolicyAccessory`.
-    - Linux: Sets `_NET_WM_WINDOW_TYPE_DESKTOP` or utility window hints.
+  - Implements OS-specific window layering and stealth behavior:
+    - Windows: Applies `WS_EX_TOOLWINDOW` and strips `WS_EX_APPWINDOW` to omit from Taskbar and Alt+Tab. While focused/active, allows typing; on blur (`WM_KILLFOCUS` / deactivate), sinks window to `HWND_BOTTOM` via `SetWindowPos(hwnd, HWND_BOTTOM, ..., SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE)`. Validates monitor bounds on display change (`WM_DISPLAYCHANGE`) to prevent off-screen or disconnected monitor placement.
+    - macOS: Sets `NSWindow.level = NSWindow.Level(Int(CGWindowLevelForKey(.desktopWindow)) + 1)` (above wallpaper/desktop icons), `NSApplicationActivationPolicyAccessory` (hides Dock icon), and `NSWindowCollectionBehaviorCanJoinAllSpaces`.
+    - Linux: Under X11, sets `_NET_WM_WINDOW_TYPE_UTILITY` with `_NET_WM_STATE_BELOW`, `_NET_WM_STATE_STICKY`, `_NET_WM_STATE_SKIP_TASKBAR`, and `_NET_WM_STATE_SKIP_PAGER`.
 - **Slint UI Layer (`ui/`)**:
-  - `NoteWindow.slint`: Title header with double-click inline editor, hover-reveal 'X', multi-line plain text area, and hover-reveal resize grip.
-  - `SettingsWindow.slint`: Clean, tabular preference interface for close behavior, font, default size, and shortcuts.
+  - `NoteWindow.slint`: Title header with double-click inline editor, hover-reveal 'X' and '+', multi-line plain text editing area, authentic curled or flat bottom-right corner, and hover-reveal resize grip.
+  - `SettingsWindow.slint`: Clean, pastel card preference interface for close behavior, font, default size, and shortcuts.
 - **Storage Engine (`storage/`)**:
-  - Atomic file writes using temporary files and rename operations to prevent file corruption during sudden shutdown.
-  - Debounced auto-save (e.g. 300ms after typing stops).
+  - Dual persistence model: Primary `Notes.json` index (cache) and individual self-contained note files (`Note 1.json`, etc.).
+  - Atomic file writes using temporary files in the same directory (`.tmp` -> flush -> `std::fs::rename`) preventing corruption during sudden power cut or crash.
+  - Debounced auto-save (300ms after user pauses typing).
+  - Robust reconciliation: If `Notes.json` is missing or corrupted, automatically rescans and rebuilds from individual note files.
+- **Single-Instance & Local IPC Subsystem (`ipc/`)**:
+  - Uses a lightweight local named pipe (`\\.\pipe\StickyNote_IPC` on Windows, Unix domain socket on macOS/Linux).
+  - Single-instance enforcement: Primary instance hosts IPC server. A second invocation (e.g. from File Explorer double-click or CLI) acts as client, sends `OPEN_FILE <path>` or `NEW_NOTE`, and exits immediately.
+  - Settings notification: When `sticky-note-settings` writes `config.json`, it sends `RELOAD_CONFIG` via the IPC pipe, triggering real-time update in `sticky-note` with zero polling.
 - **Shortcut Handler (`shortcuts/`)**:
-  - Binds OS global hotkeys via `global-hotkey` crate. Dispatches `CreateNote` and `OpenSettings` events.
+  - Binds OS global hotkeys via `global-hotkey` crate on the event loop. Dispatches `CreateNote` and `OpenSettings` events.
 
 ## Data flow
-1. Startup: `sticky-note` reads `config.json` (or initializes defaults), loads `Notes.json`, and spawns each active note window at its last persisted coordinates and dimensions.
-2. Typing: Slint triggers text change event → debounced memory update → atomic write to `Notes.json`.
-3. Moving/Resizing: Slint window geometry changes → updates note coordinates `(x, y, w, h)` in state → saved to disk.
-4. Settings Change: User launches `Sticky Note Settings` → edits preference → writes to `config.json` → sends OS IPC or file-watch event → `sticky-note` reloads config.
+1. Startup: `sticky-note` acquires single-instance lock/named pipe. Reads `config.json` (or initializes defaults), loads `Notes.json` index (or rebuilds from directory), validates monitor bounds against active displays, and spawns each active note window (`is_closed == false`) at its persisted geometry.
+2. Typing: Slint triggers text change event → debounced memory update (300ms) → atomic write to both the note file and `Notes.json`.
+3. Moving/Resizing: Slint window geometry changes → updates note coordinates `(x, y, w, h)` in state → saved to disk. When resized, updates `last_used_width` and `last_used_height` in `config.json`.
+4. File Launch: User double-clicks a note file in File Explorer → secondary process sends path over IPC to primary process → primary process opens or focuses note window → secondary process exits.
+5. Settings Change: User launches `Sticky Note Settings` → edits preference → writes to `config.json` → sends `RELOAD_CONFIG` via IPC → `sticky-note` reloads config instantly with 0% idle CPU.
 
 ## Boundaries
 - `sticky-note` UI owns: View rendering, user text capture, hover detection, drag/resize handles.
